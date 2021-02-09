@@ -5,9 +5,3 @@ Create a Simpsons AT-5000 auto phone dialler using parts from TE14 Dialer and th
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/kpkczu2ruyp11.png)
 
 
-
-## Ref
-http://sellcom.com/phonedialer.html
-
-https://simpsons.fandom.com/wiki/AT-5000_Auto-dialer
-
