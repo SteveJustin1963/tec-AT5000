@@ -13,27 +13,27 @@ Create a Simpsons AT-5000 auto phone dialler using parts from TE14 Dialer and th
 - redial, larger red ligt
 
 ### buttons
--play -pm
--record -pm
--power -ph
--keypad -pm, encoder tones
--100, flat long, unknown, mabe skip 100 numbers ?
+- play -pm
+- record -pm
+- power -ph
+- keypad -pm, encoder tones
+- 100, flat long, unknown, maybe skip 100 numbers ?
 
 ### switches
--manual/auto -slide or flip
--tape red -slide or flip
+- manual/auto -slide or flip
+- tape red -slide or flip
 
 ### diaplay
-analog numbers 8 wheels
+- analog numbers 8 wheels
 
 ### tape
-two turning knobs
-left, 4 selections
-right, 3 selections
+- two turning knobs
+- left, 4 selections
+- right, 3 selections
 
 ### speaker
-maybe 4 inch dia
-grilled cover
+- about 4 inch dia
+- grilled cover
 
  
 
