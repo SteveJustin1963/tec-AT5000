@@ -7,10 +7,10 @@ Create a Simpsons AT-5000 auto phone dialler using parts from TE14 Dialer and th
 ## features
 
 ### indicators
--play, red led
--record, red led
--dial, larger red ligt
--redial, larger red ligt
+- play, red led
+- record, red led
+- dial, larger red ligt
+- redial, larger red ligt
 
 ### buttons
 -play -pm
