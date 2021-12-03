@@ -10,7 +10,7 @@ https://en.wikipedia.org/wiki/Auto_dialer
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/fp1.png)
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/kpkczu2ruyp11.png)
 
-## features
+## external features
 
 ### indicators
 - play, red led
@@ -42,10 +42,10 @@ https://en.wikipedia.org/wiki/Auto_dialer
 - grilled cover
 
 ### back not visible
-- old 
+- old telecom plug
 - rj45 connector modern
 
-
+## program features
 
  
 
