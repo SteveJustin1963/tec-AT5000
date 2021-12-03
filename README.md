@@ -35,7 +35,9 @@ Create a Simpsons AT-5000 auto phone dialler using parts from TE14 Dialer and th
 - about 4 inch dia
 - grilled cover
 
- 
+### back not visible
+- old 
+- rj45 connector modern
 
 
 
