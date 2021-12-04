@@ -10,7 +10,7 @@ https://en.wikipedia.org/wiki/Auto_dialer
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/fp1.png)
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/kpkczu2ruyp11.png)
 
-## external features
+## analysing the external features of the comic picture
 
 ### indicators
 - play, red led
@@ -50,8 +50,8 @@ https://en.wikipedia.org/wiki/Auto_dialer
 - 2
 - 3
 
-## new layout
-the tape is a digital sound card
+## simplifying the layout
+instead of a real tape, we can use a cheap digital sound card that can act like a short tape recording
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/docs/HW0640_3-800x600.jpg)
 
