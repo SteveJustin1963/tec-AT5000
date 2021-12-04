@@ -61,6 +61,8 @@ the top 4 numbers are selectors
 
 
  
+## Ref
 
+http://www.talkingelectronics.com/projects/Elektor/Dial%20Alarm-2/DialAlarm-2.html
 
 
