@@ -55,7 +55,7 @@ instead of a real tape, we can use a cheap digital sound card that can act like 
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/docs/HW0640_3-800x600.jpg)
 
-the top 4 numbers are selectors
+the top 4 numbers are selectors, the rest are typed in on the pad
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/layout.png)
 
