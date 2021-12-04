@@ -46,6 +46,19 @@ https://en.wikipedia.org/wiki/Auto_dialer
 - rj45 connector modern
 
 ## program features
+- 1
+- 2
+- 3
+
+## new layout
+the tape is a digital sound card
+
+![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/docs/HW0640_3-800x600.jpg)
+
+the top 4 numbers are selectors
+
+![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/layout.png)
+
 
  
 
