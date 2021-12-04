@@ -65,4 +65,4 @@ the top 4 numbers are selectors
 
 http://www.talkingelectronics.com/projects/Elektor/Dial%20Alarm-2/DialAlarm-2.html
 
-
+pg16   https://github.com/SteveJustin1963/tec-BOOKS/blob/master/TE/Mag/talking_electronics_14.pdf
