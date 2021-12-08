@@ -3,10 +3,7 @@ Inspired by the Simpsons AT-5000 auto dialer,
 use software ideas from TE14 Dialer and hardware from TE-Dial-Alarm-2, hack some code in asm and MINT 
 
 ## Warning
-
-Compliance
-https://en.wikipedia.org/wiki/Auto_dialer
-
+Read about compliance at https://en.wikipedia.org/wiki/Auto_dialer
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mp1.png)
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mpad1.png)
