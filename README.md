@@ -10,14 +10,12 @@ https://en.wikipedia.org/wiki/Auto_dialer
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/fp1.png)
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/kpkczu2ruyp11.png)
 
-## analysing the external features of the comic picture
-
+## features
 ### indicators
 - play, red led
 - record, red led
 - dial, larger red ligt
 - redial, larger red ligt
-
 ### buttons
 - play -pm
 - record -pm
