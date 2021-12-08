@@ -23,7 +23,7 @@ https://en.wikipedia.org/wiki/Auto_dialer
 - record -pm
 - power -ph
 - keypad -pm, encoder tones
-- 100, flat long, unknown, maybe skip 100 numbers ?
+- 100, start dialing the first 100 numbers ?
 
 ### switches
 - manual/auto -slide or flip
