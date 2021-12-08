@@ -39,14 +39,18 @@ https://en.wikipedia.org/wiki/Auto_dialer
   - old telecom plug
   - rj45 connector modern
 
-## simplifying the layout
-instead of a real tape, we can use a cheap digital sound card that can act like a short tape recording
+## new simple layout
+we can use the tec-1's 
+-7 seg display
+- keypad
+- spk
+we add
+- mic
+- cheap digital sound record and play board, upto 30 seconds
 
-![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/docs/HW0640_3-800x600.jpg)
+![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/docs/vmc1.png)
 
-the top 4 numbers are selectors, the rest are typed in on the pad
 
-![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/layout.png)
 
 
  
