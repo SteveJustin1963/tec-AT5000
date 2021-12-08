@@ -9,7 +9,7 @@ use software ideas from TE14 Dialer and hardware from TE-Dial-Alarm-2, hack some
 Read about compliance at https://en.wikipedia.org/wiki/Auto_dialer
 
 ## Features
-we turn features into our system
+convert the at5000 features into our simple system
 - indicators: play, record, dial, redial, power > tec1 LEDS
 - buttons: play, record, power, keypad, 100, manual, auto, tape-red > tec1 keypad 
 - diaplay: > tec1 LEDS
