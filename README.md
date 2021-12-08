@@ -14,41 +14,30 @@ https://en.wikipedia.org/wiki/Auto_dialer
 ## features
 - indicators
   - play, red led
-- record, red led
-- dial, larger red ligt
-- redial, larger red ligt
-
-### buttons
-- play -pm
-- record -pm
-- power -ph
-- keypad -pm, encoder tones
-- 100, start dialing the first 100 numbers ?
-
-### switches
-- manual/auto -slide or flip
-- tape red -slide or flip
-
-### diaplay
-- analog numbers 8 wheels
-
-### tape
-- two turning knobs
-- left, 4 selections
-- right, 3 selections
-
-### speaker
-- about 4 inch dia
-- grilled cover
-
-### back not visible
-- old telecom plug
-- rj45 connector modern
-
-## program features
-- 1
-- 2
-- 3
+  - record, red led
+  - dial, larger red ligt
+  - redial, larger red ligt
+- buttons
+  - play -pm
+  - record -pm
+  - power -ph
+  - keypad -pm, encoder tones
+  - 100, start dialing the first 100 numbers ?
+- switches
+  - manual/auto -slide or flip
+  - tape red -slide or flip
+-diaplay
+  - analog numbers 8 wheels
+- tape
+  - two turning knobs
+  - left, 4 selections
+  - right, 3 selections
+- speaker
+  - about 4 inch dia
+  - grilled cover
+- back not visible
+  - old telecom plug
+  - rj45 connector modern
 
 ## simplifying the layout
 instead of a real tape, we can use a cheap digital sound card that can act like a short tape recording
