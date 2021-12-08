@@ -16,15 +16,7 @@ convert the at5000 features into our simple system
 - tape: left/right knob > tec1 keypad
 - speaker: > tec1 spkr
 - back: > rj45 connector
-
-## Layout
-we can use the tec-1's 
-- 7 seg display
-- keypad
-- spk
-we add some
-- mic, opto couplers, diode bride and ccts
-- cheap digital sound record and play board, upto 30 seconds
+- in our cct we add a mic, opto coupler, diode bride etc and a cheap digital sound record and play board, upto 30 seconds
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/docs/vmc1.png)
 
