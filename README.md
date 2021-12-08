@@ -12,8 +12,8 @@ https://en.wikipedia.org/wiki/Auto_dialer
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mpad1.png)
 
 ## features
-### indicators
-- play, red led
+- indicators
+  - play, red led
 - record, red led
 - dial, larger red ligt
 - redial, larger red ligt
