@@ -17,7 +17,7 @@ convert the at5000 features into our simple system
 - speaker: > tec1 spkr
 - back: > rj45 connector
 - in our cct we add a mic, opto coupler, diode bride etc 
-- a voice audio module 20secopnd, LX20LYA
+- a voice audio module 20 sec, LX20LYA
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/docs/vmc1.png)
 
