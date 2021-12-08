@@ -8,7 +8,7 @@ use software ideas from TE14 Dialer and hardware from TE-Dial-Alarm-2, hack some
 ## Warning
 Read about compliance at https://en.wikipedia.org/wiki/Auto_dialer
 
-## features
+## Features
 we turn features into our system
 - indicators: play, record, dial, redial, power > tec1 LEDS
 - buttons: play, record, power, keypad, 100, manual, auto, tape-red > tec1 keypad 
@@ -17,7 +17,7 @@ we turn features into our system
 - speaker: > tec1 spkr
 - back: > rj45 connector
 
-## new simple layout
+## Layout
 we can use the tec-1's 
 - 7 seg display
 - keypad
