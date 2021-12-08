@@ -16,11 +16,16 @@ convert the at5000 features into our simple system
 - tape: left/right knob > tec1 keypad
 - speaker: > tec1 spkr
 - back: > rj45 connector
-- in our cct we add a mic, opto coupler, diode bride etc and a cheap digital sound record and play board, upto 30 seconds
+- in our cct we add a mic, opto coupler, diode bride etc 
+- a voice audio module 20secopnd, LX20LYA
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/docs/vmc1.png)
 
-
+the voice audio module can record an audio message via a microphone and its subsequent playback into a loudspeaker or phone line. 
+The message length is a maximum of 20s, at a sampling frequency of 3.2 kHz. This can be set using the R0SC resistor. The best
+recording quality is 8kHz when sampling, the recording length is then 8s. 
+We need to add a electret microphone, loudspeaker, button and or switch control, resistors, capacitors and LED for signaling the recording status. 
+The power supply is 2.7V ~ 4.7V, ok from batteries, ie 3 AAA's or button cells.
 
 
  
