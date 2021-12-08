@@ -1,5 +1,5 @@
 # tec-AT5000
-inspired by the Simpsons AT-5000 auto dialer,
+Inspired by the Simpsons AT-5000 auto dialer,
 use software ideas from TE14 Dialer and hardware from TE-Dial-Alarm-2, hack some code in asm and MINT 
 
 ## Warning
