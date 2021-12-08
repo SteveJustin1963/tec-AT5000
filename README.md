@@ -16,6 +16,7 @@ https://en.wikipedia.org/wiki/Auto_dialer
 - record, red led
 - dial, larger red ligt
 - redial, larger red ligt
+
 ### buttons
 - play -pm
 - record -pm
