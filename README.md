@@ -12,32 +12,13 @@ https://en.wikipedia.org/wiki/Auto_dialer
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mpad1.png)
 
 ## features
-- indicators
-  - play, red led
-  - record, red led
-  - dial, larger red ligt
-  - redial, larger red ligt
-- buttons
-  - play -pm
-  - record -pm
-  - power -ph
-  - keypad -pm, encoder tones
-  - 100, start dialing the first 100 numbers ?
-- switches
-  - manual/auto -slide or flip
-  - tape red -slide or flip
--diaplay
-  - analog numbers 8 wheels
-- tape
-  - two turning knobs
-  - left, 4 selections
-  - right, 3 selections
-- speaker
-  - about 4 inch dia
-  - grilled cover
-- back not visible
-  - old telecom plug
-  - rj45 connector modern
+we turn features into our system
+- indicators: play, record, dial, redial, power > tec1 LEDS
+- buttons: play, record, power, keypad, 100, manual, auto, tape-red > tec1 keypad 
+- diaplay: > tec1 LEDS
+- tape: left/right knob > tec1 keypad
+- speaker: > tec1 spkr
+- back: > rj45 connector
 
 ## new simple layout
 we can use the tec-1's 
