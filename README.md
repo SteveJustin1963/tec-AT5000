@@ -41,12 +41,13 @@ https://en.wikipedia.org/wiki/Auto_dialer
 
 ## new simple layout
 we can use the tec-1's 
--7 seg display
+- 7 seg display
 - keypad
 - spk
 we add
 - mic
 - cheap digital sound record and play board, upto 30 seconds
+- and some other h/w parts
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/docs/vmc1.png)
 
