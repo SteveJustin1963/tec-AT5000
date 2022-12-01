@@ -27,7 +27,7 @@ recording quality is 8kHz when sampling, the recording length is then 8s.
 We need to add a electret microphone, loudspeaker, button and or switch control, resistors, capacitors and LED for signaling the recording status. 
 The power supply is 2.7V ~ 4.7V, ok from batteries, ie 3 AAA's or button cells.
 
-
+https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/layout.png
  
 ## Ref
 - http://www.talkingelectronics.com/projects/Elektor/Dial%20Alarm-2/DialAlarm-2.html
