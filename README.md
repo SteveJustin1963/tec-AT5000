@@ -31,16 +31,26 @@ Progressive dialers: These dialers automatically place calls and connect them to
 Hosted dialers: These dialers are hosted and managed by a third party, and can be accessed remotely by operators using a web browser or app. This allows companies to set up a call center without the need for on-site hardware.
 
 
+## Chossing our capabilities for the AT5000 will
 
-## Our AT5000 will be a Power dialer.  Features:
-- indicators: play, record, dial, redial, power > tec1 LEDS
-- buttons: play, record, power, keypad, 100, manual, auto, tape-red > tec1 keypad 
-- diaplay: > tec1 LEDS
-- tape: left/right knob > tec1 keypad
-- speaker: > tec1 spkr
-- back: > rj45 connector
-- in our cct we add a mic, opto coupler, diode bride, dtmf decode, etc 
-- a voice audio module 20 sec, LX20LYA
+- Power dialer plus xxx
+- 
+- indicators: 
+  - play, record, dial, redial, power > tec1 LEDS
+- buttons: 
+-   play, record, power, keypad, 100, manual, auto, tape-red > tec1 keypad 
+- diaplay: 
+-   > tec1 LEDS
+- tape: 
+-   left/right knob > tec1 keypad
+- speaker: 
+-   > tec1 spkr
+- back: 
+-   > rj45 connector
+- in our cct 
+-   we add a mic, opto coupler, diode bride, dtmf decode, etc 
+- a voice 
+-   audio module 20 sec, LX20LYA
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/docs/vmc1.png)
 
