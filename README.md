@@ -32,7 +32,7 @@ Hosted dialers: These dialers are hosted and managed by a third party, and can b
 
 
 ## Chossing our capabilities for the AT5000 will
-
+need to decide what features and we will select and decide how to combine them. wip....
 - Power dialer plus xxx
 - 
 - indicators: 
