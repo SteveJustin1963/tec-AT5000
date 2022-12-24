@@ -10,8 +10,10 @@ Here we will use a combination of software and hardware to create a telephone au
 
 
 
-## Warning
-Read about compliance at https://en.wikipedia.org/wiki/Auto_dialer
+## Warning and compliance 
+"In Australia, the use of autodialers for telemarketing purposes is regulated by the Privacy Act 1988 and the Do Not Call Register Act 2006. The Australian Communications and Media Authority (ACMA) warns that telemarketers who use autodialers without the express consent of the recipient may be subject to fines of up to AUD 1.8 million for corporations and AUD 360,000 for individuals. It is important for companies and organizations using autodialers in Australia to ensure that they are complying with these regulations and obtaining the necessary consent from recipients before making calls."
+
+https://en.wikipedia.org/wiki/Auto_dialer
 
 ## Features
 convert the at5000 features into our simple system
