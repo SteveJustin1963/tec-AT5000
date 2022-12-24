@@ -15,6 +15,20 @@ Here we will use a combination of software and hardware to create a telephone au
 
 https://en.wikipedia.org/wiki/Auto_dialer
 
+## There are several different types of autodialers, each with their own unique features and capabilities:
+
+Predictive dialers: These dialers automatically place calls and connect them to a live operator once the recipient answers. They are designed to increase the efficiency of telemarketing campaigns by reducing the amount of time operators spend waiting for someone to answer the phone.
+
+Preview dialers: These dialers allow operators to view the information about a call before it is connected, allowing them to tailor their pitch to the specific needs and interests of the recipient.
+
+Power dialers: These dialers automatically place calls and move on to the next call in the list once the recipient hangs up, allowing operators to handle a higher volume of calls in a shorter amount of time.
+
+Progressive dialers: These dialers automatically place calls and connect them to a live operator once the recipient answers, but they also allow operators to work on other tasks while waiting for a call to be connected.
+
+Hosted dialers: These dialers are hosted and managed by a third party, and can be accessed remotely by operators using a web browser or app. This allows companies to set up a call center without the need for on-site hardware.
+
+
+
 ## Features
 convert the at5000 features into our simple system
 - indicators: play, record, dial, redial, power > tec1 LEDS
