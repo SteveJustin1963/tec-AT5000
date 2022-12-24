@@ -16,6 +16,7 @@ In Australia, there are strict laws and regulations regarding spam and telemarke
 - Spam Act 2003
 - Do Not Call Register Act 2006 
 - Telecommunications (Telemarketing and Research Calls) Industry Standard 2017
+- https://www.acma.gov.au/spam-and-telemarketing
 
 ## There are several different types of autodialers, each with their own unique features and capabilities:
 
