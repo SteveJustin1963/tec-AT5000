@@ -24,7 +24,7 @@ Predictive dialers: These dialers automatically place calls and connect them to 
 
 Preview dialers: These dialers allow operators to view the information about a call before it is connected, allowing them to tailor their pitch to the specific needs and interests of the recipient.
 
-Power dialers: These dialers automatically place calls and move on to the next call in the list once the recipient hangs up, allowing operators to handle a higher volume of calls in a shorter amount of time.
+Power dialers: These dialers automatically place calls and move on to the next call in the list once the recipient hangs up, allowing operators to handle a higher volume of calls in a shorter amount of time. round robin phone line extension select
 
 Progressive dialers: These dialers automatically place calls and connect them to a live operator once the recipient answers, but they also allow operators to work on other tasks while waiting for a call to be connected.
 
