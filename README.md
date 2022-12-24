@@ -65,6 +65,9 @@ The power supply is 2.7V ~ 4.7V, ok from batteries, ie 3 AAA's or button cells.
 
 ![layout](https://user-images.githubusercontent.com/58069246/205056653-5459de57-910f-4eac-83e6-3f8193f32d24.png)
 
+![image](https://user-images.githubusercontent.com/58069246/209416127-65bf45f7-ecb8-4924-ad65-60ac071a900d.png)
+
+
  
 ## Ref
 - http://www.talkingelectronics.com/projects/Elektor/Dial%20Alarm-2/DialAlarm-2.html
