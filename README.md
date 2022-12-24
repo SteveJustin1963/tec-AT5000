@@ -65,7 +65,7 @@ The power supply is 2.7V ~ 4.7V, ok from batteries, ie 3 AAA's or button cells.
 
 ![layout](https://user-images.githubusercontent.com/58069246/205056653-5459de57-910f-4eac-83e6-3f8193f32d24.png)
 
-![image](https://user-images.githubusercontent.com/58069246/209416148-f55ddba2-3863-4ca7-bdf4-13ac490a6775.png)
+![image](https://user-images.githubusercontent.com/58069246/209416173-8975d636-3432-493c-9972-6893980a00f0.png)
 
 
  
