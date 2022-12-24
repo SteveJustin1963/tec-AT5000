@@ -27,8 +27,7 @@ Hosted dialers: These dialers are hosted and managed by a third party, and can b
 
 
 
-## Features
-convert the at5000 features into our simple system
+## Our AT5000 will be a Power dialer.  Features:
 - indicators: play, record, dial, redial, power > tec1 LEDS
 - buttons: play, record, power, keypad, 100, manual, auto, tape-red > tec1 keypad 
 - diaplay: > tec1 LEDS
