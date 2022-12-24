@@ -1,6 +1,8 @@
 # tec-AT5000
-Inspired by the Simpsons AT-5000 auto dialer,
-use software from TE14 Dialer and hardware from TE-Dial-Alarm-2, hack some code in asm and MINT 
+
+A telephone autodialler is a device or system that can automatically place telephone calls and typically includes features such as the ability to store a list of phone numbers, play a recorded message or series of messages, and provide options for the recipient to interact with the call, such as by pressing a key to hear more information or transfer to a live operator. Autodiallers are often used for mass communication purposes, such as for emergency alerts, political campaigns, or telemarketing. They can also be used in a business setting to automate calls to customers or clients.
+
+Here we will use a combination of software and hardware to create a telephone autodialler that is inspired by the AT-5000 auto dialer from the Simpsons. The software will come from various sources, including issue TE14's "Dialer," and we will use hardware from the TE-Dial-Alarm-2. We will also incorporate some ASM (assembly language) and MINT (MINiature Teletype) code in the process of hacking these components together.
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mp1.png)
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mpad1.png)
