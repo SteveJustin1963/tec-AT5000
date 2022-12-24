@@ -11,7 +11,11 @@ Here we will use a combination of software and hardware to create a telephone au
 
 
 ## Warning and compliance 
-In Australia, there are strict laws and regulations regarding spam and telemarketing, including the use of autodialers. These regulations apply to both domestic and international enterprises and companies using calls as part of their sales strategy must comply with them. The Do Not Call Registry is a government service that prohibits unsolicited calls and telemarketers and sales representatives must stop all forms of contact with registered individuals within 30 days. The Privacy Act 1988 and the Do Not Call Register Act 2006 also regulate the use of autodialers for telemarketing purposes and telemarketers who use them without consent may face fines of up to AUD 1.8 million for corporations and AUD 360,000 for individuals. It is important for companies using autodialers in Australia to ensure they are following these regulations and obtaining the necessary consent from recipients before making calls. https://en.wikipedia.org/wiki/Auto_dialer
+In Australia, there are strict laws and regulations regarding spam and telemarketing, including the use of autodialers. These regulations apply to both domestic and international enterprises and companies using calls as part of their sales strategy must comply with them. The Do Not Call Registry is a government service that prohibits unsolicited calls and telemarketers and sales representatives must stop all forms of contact with registered individuals within 30 days. The Privacy Act 1988 and the Do Not Call Register Act 2006 also regulate the use of autodialers for telemarketing purposes and telemarketers who use them without consent may face fines of up to AUD 1.8 million for corporations and AUD 360,000 for individuals. It is important for companies using autodialers in Australia to ensure they are following these regulations and obtaining the necessary consent from recipients before making calls. 
+- https://en.wikipedia.org/wiki/Auto_dialer
+- Spam Act 2003
+- Do Not Call Register Act 2006 
+- Telecommunications (Telemarketing and Research Calls) Industry Standard 2017
 
 ## There are several different types of autodialers, each with their own unique features and capabilities:
 
