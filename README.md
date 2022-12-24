@@ -60,6 +60,9 @@ recording quality is 8kHz when sampling, the recording length is then 8s.
 We need to add a electret microphone, loudspeaker, button and or switch control, resistors, capacitors and LED for signaling the recording status. 
 The power supply is 2.7V ~ 4.7V, ok from batteries, ie 3 AAA's or button cells.
 
+
+## suggested layout
+
 ![layout](https://user-images.githubusercontent.com/58069246/205056653-5459de57-910f-4eac-83e6-3f8193f32d24.png)
 
  
