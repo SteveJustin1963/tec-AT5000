@@ -4,13 +4,14 @@
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mpad1.png)
 
 
-
-Here we will use a combination of software and hardware to create a telephone autodialler that is inspired by the AT-5000 auto dialer from the Simpsons. The software will come from various sources, including issue TE14's software "Dialer," and we will use hardware from the TE-Dial-Alarm-2. We will also incorporate some ASM (assembly language) and MINT code in the process of hacking these components together.
-
+We will use a combination of software and hardware to create a telephone autodialler that is inspired by the AT-5000 auto dialer from the Simpsons. The software will come from various sources, including; 
+- issue TE14's software "Dialer," 
+- and we will use hardware from the TE-Dial-Alarm-2. 
+- also incorporate some ASM (assembly language) and MINT code in the process of hacking these components together.
 
 
 ## Let shoose AT5000 - Power dialer plus
-need to decide what features and we will select and decide how to combine them. 
+see wiki. need to decide what features and we will select and decide how to combine them. 
 
 - indicators: 
   - play, record, dial, redial, power = tec1 LEDS
