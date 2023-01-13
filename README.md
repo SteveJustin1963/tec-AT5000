@@ -68,10 +68,5 @@ The power supply is 2.7V ~ 4.7V, ok from batteries, ie 3 AAA's or button cells.
 ![image](https://user-images.githubusercontent.com/58069246/209416173-8975d636-3432-493c-9972-6893980a00f0.png)
 
 
- 
-## Ref
-- http://www.talkingelectronics.com/projects/Elektor/Dial%20Alarm-2/DialAlarm-2.html
-- pg16  https://github.com/SteveJustin1963/tec-BOOKS/blob/master/TE/Mag/talking_electronics_14.pdf
-- https://www.youtube.com/watch?v=9rh50BSv_CE
 
-![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/feds.png)
+
