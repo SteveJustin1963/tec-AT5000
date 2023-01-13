@@ -4,31 +4,9 @@
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mpad1.png)
 
 
-A telephone autodialler is a device or system that can automatically place telephone calls and typically includes features such as the ability to store a list of phone numbers, play a recorded message or series of messages, and provide options for the recipient to interact with the call, such as by pressing a key to hear more information or transfer to a live operator. Autodiallers are often used for mass communication purposes, such as for emergency alerts, political campaigns, or telemarketing. They can also be used in a business setting to automate calls to customers or clients.
 
 Here we will use a combination of software and hardware to create a telephone autodialler that is inspired by the AT-5000 auto dialer from the Simpsons. The software will come from various sources, including issue TE14's software "Dialer," and we will use hardware from the TE-Dial-Alarm-2. We will also incorporate some ASM (assembly language) and MINT code in the process of hacking these components together.
 
-
-
-## Warning and compliance 
-In Australia, there are strict laws and regulations regarding spam and telemarketing, including the use of autodialers. These regulations apply to both domestic and international enterprises and companies using calls as part of their sales strategy must comply with them. The Do Not Call Registry is a government service that prohibits unsolicited calls and telemarketers and sales representatives must stop all forms of contact with registered individuals within 30 days. The Privacy Act 1988 and the Do Not Call Register Act 2006 also regulate the use of autodialers for telemarketing purposes and telemarketers who use them without consent may face fines of up to AUD 1.8 million for corporations and AUD 360,000 for individuals. It is important for companies using autodialers in Australia to ensure they are following these regulations and obtaining the necessary consent from recipients before making calls. 
-- https://en.wikipedia.org/wiki/Auto_dialer
-- Spam Act 2003
-- Do Not Call Register Act 2006 
-- Telecommunications (Telemarketing and Research Calls) Industry Standard 2017
-- https://www.acma.gov.au/spam-and-telemarketing
-
-## There are several different types of autodialers, each with their own unique features and capabilities:
-
-Predictive dialers: These dialers automatically place calls and connect them to a live operator once the recipient answers. They are designed to increase the efficiency of telemarketing campaigns by reducing the amount of time operators spend waiting for someone to answer the phone.
-
-Preview dialers: These dialers allow operators to view the information about a call before it is connected, allowing them to tailor their pitch to the specific needs and interests of the recipient.
-
-Power dialers: These dialers automatically place calls and move on to the next call in the list once the recipient hangs up, allowing operators to handle a higher volume of calls in a shorter amount of time. round robin phone line extension select
-
-Progressive dialers: These dialers automatically place calls and connect them to a live operator once the recipient answers, but they also allow operators to work on other tasks while waiting for a call to be connected.
-
-Hosted dialers: These dialers are hosted and managed by a third party, and can be accessed remotely by operators using a web browser or app. This allows companies to set up a call center without the need for on-site hardware.
 
 
 ## Chossing our capabilities for the AT5000 will
