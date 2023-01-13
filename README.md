@@ -13,22 +13,14 @@ We will use a combination of software and hardware to create a telephone autodia
 ## Let shoose AT5000 - Power dialer plus
 see wiki. need to decide what features and we will select and decide how to combine them. 
 
-- indicators: 
-  - play, record, dial, redial, power = tec1 LEDS
-- buttons: 
-  - play, record, power, keypad, 100, manual, auto, tape-red = tec1 keypad 
-- display: 
-  - =tec1 LEDS
-- tape: 
-  - left/right knob = tec1 keypad
-- speaker: 
-  - = tec1 spkr
-- back: 
-  - = rj45 connector
-- circuit
-  - mic, opto coupler, diode bride, dtmf decode, etc 
-- a voice 
-  - LX20LYA- voice audio module, 20 sec 
+- indicators; play, record, dial, redial, power = tec1 LEDS
+- buttons; play, record, power, keypad, 100, manual, auto, tape-red = tec1 keypad 
+- display; =tec1 LEDS
+- tape; left/right knob = tec1 keypad
+- speaker; = tec1 spkr
+- back; = rj45 connector
+- circuit; mic, opto coupler, diode bride, dtmf decode, etc 
+- a voice; LX20LYA- voice audio module, 20 sec 
 
 
 ## suggested layout
