@@ -10,7 +10,7 @@ We will use a combination of software and hardware to create a telephone autodia
 - also incorporate some ASM (assembly language) and MINT code in the process of hacking these components together.
 
 
-## Let shoose AT5000 - Power dialer plus
+## AT5000 - Power Dialer
 see wiki. need to decide what features and we will select and decide how to combine them. 
 
 - indicators; play, record, dial, redial, power = tec1 LEDS
