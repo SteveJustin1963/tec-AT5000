@@ -9,28 +9,26 @@ Here we will use a combination of software and hardware to create a telephone au
 
 
 
-## Chossing our capabilities for the AT5000 will
-need to decide what features and we will select and decide how to combine them. wip....
-- Power dialer plus xxx
-- 
+## Let shoose AT5000 - Power dialer plus
+need to decide what features and we will select and decide how to combine them. 
+
 - indicators: 
-  - play, record, dial, redial, power > tec1 LEDS
+  - play, record, dial, redial, power = tec1 LEDS
 - buttons: 
--   play, record, power, keypad, 100, manual, auto, tape-red > tec1 keypad 
-- diaplay: 
--   > tec1 LEDS
+  - play, record, power, keypad, 100, manual, auto, tape-red = tec1 keypad 
+- display: 
+  - =tec1 LEDS
 - tape: 
--   left/right knob > tec1 keypad
+  - left/right knob = tec1 keypad
 - speaker: 
--   > tec1 spkr
+  - = tec1 spkr
 - back: 
--   > rj45 connector
-- in our cct 
--   we add a mic, opto coupler, diode bride, dtmf decode, etc 
+-  = rj45 connector
+- circuit
+  - mic, opto coupler, diode bride, dtmf decode, etc 
 - a voice 
--   audio module 20 sec, LX20LYA- voice audio module
--   
--    
+ - LX20LYA- voice audio module, 20 sec 
+
 
 ## suggested layout
 
