@@ -3,7 +3,7 @@
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mp1.png)
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mpad1.png)
 
-We plan to develop a telephone autodialer that draws inspiration from the AT-5000 auto dialer featured in the Simpsons. Our approach will involve a combination of software and hardware components. The software will be sourced from various providers, including the TE14's "Dialer" software. Additionally, we will incorporate hardware elements from the TE-Dial-Alarm-2. To achieve this, we will employ do a ASM (assembly language) version then a MINT code version.
+We plan to develop a telephone autodialer that draws inspiration from the AT-5000 auto dialer featured in the Simpsons. Our approach will involve a combination of software and hardware components. The software will be sourced from various providers, including the TE14's "Dialer" software. Additionally, we will incorporate hardware elements from the TE-Dial-Alarm-2. To achieve this, we will do a ASM (assembly language) version then a MINT code version.
 
 For the design of our autodialer, we will refer to the AT5000 Power Dialer as described on the Wikipedia page. We will carefully select the desired features from the AT5000 and determine the best approach to combine them. The selected features include:
 
