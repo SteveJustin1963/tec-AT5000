@@ -1,9 +1,10 @@
 # tec-AT5000
+## warnings
+https://github.com/SteveJustin1963/tec-AT5000/wiki
+
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mp1.png)
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mpad1.png)
-
-We plan to develop a telephone autodialer that draws inspiration from the AT-5000 auto dialer featured in the Simpsons. Our approach will involve a combination of software and hardware components. The software will be sourced from various providers, including the TE14's "Dialer" software. Additionally, we will incorporate hardware elements from the TE-Dial-Alarm-2. To achieve this, we will do a ASM (assembly language) version then a MINT code version.
 
 For the design of our autodialer, we will refer to the AT5000 Power Dialer as described on the Wikipedia page. We will carefully select the desired features from the AT5000 and determine the best approach to combine them. The selected features include:
 
@@ -17,6 +18,62 @@ For the design of our autodialer, we will refer to the AT5000 Power Dialer as de
 - Voice: We will incorporate the LX20LYA voice audio module, providing a 20-second voice capability.
 
 By combining these software and hardware elements, we aim to create a functional and inspired autodialer reminiscent of the AT-5000 from the Simpsons.
+
+
+## plan 
+develop a telephone autodialer that draws inspiration from 
+- the AT-5000 auto dialer featured in the Simpsons. 
+- hardware elements from the TE-Dial-Alarm-2. 
+- "Dialer" software TE14-pg16 
+
+
+## 
+
+```
+PHONE DIALLER - Part I 
+
+LD D, 08 
+XOR A 
+LD HL,0900 
+LD (HL),A 
+INC HL 
+DEC D 
+JR NZ 
+LD A,I 
+CP 0A
+JR NC 
+LD DE 0880
+ADD A,E 
+LD E,A 
+LD HL,0900 
+LD A,(HL) 
+CP 00
+JR Z 
+INC HL 
+JR 
+LD A,(DE) 
+LD (HL),A 
+LD A,FF 
+LD I,A 
+LD C,20 
+LD HL,0900 
+LD D,06
+LD B,00
+LD A(HL) 
+OUT (02),A 
+LD A,C 
+OUT (01),A 
+RRC C 
+DJNZ 
+XOR A 
+OUT(01),A 
+INC HL 
+DEC D 
+JR NZ 
+JR 
+```
+
+## TE-Dial-Alarm-2
 
 
 ##  mockup layout
