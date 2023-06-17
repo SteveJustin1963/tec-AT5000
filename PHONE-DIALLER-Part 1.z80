@@ -1,0 +1,43 @@
+
+start LD D, 08  ;The first 8 memory locations are cleared so that the program
+                ;will come on with a blank screen. We need only 6 locations.
+                ;The 7th location is explained in the text. 
+      XOR A 
+      LD HL,0900  
+      LD (HL),A ;Register A is zeroed and this value is inserted into 0900- 0907
+                ;via the HL register being the pointer register.   
+      INC HL 
+DEC D 
+JR NZ 
+LD A,I 
+CP 0A
+JR NC 
+LD DE 0880
+ADD A,E 
+LD E,A 
+LD HL,0900 
+LD A,(HL) 
+CP 00
+JR Z 
+INC HL 
+JR 
+LD A,(DE) 
+LD (HL),A 
+LD A,FF 
+LD I,A 
+LD C,20 
+LD HL,0900 
+LD D,06
+LD B,00
+LD A(HL) 
+OUT (02),A 
+LD A,C 
+OUT (01),A 
+RRC C 
+DJNZ 
+XOR A 
+OUT(01),A 
+INC HL 
+DEC D 
+JR NZ 
+JR 
