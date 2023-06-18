@@ -97,7 +97,19 @@ L3      LD B,0x00     ; Load B with delay value for turning ON each digit.
         JR NZ, L3   ; Jump to the start of the loop if D is not zero
         JR L2       ; Jump to the start of the program if D is zero and look for a new key
 ```
+The program starts by clearing the first 8 memory locations to ensure a blank screen display, although only 6 locations are necessary. Register A is set to zero, and this value is stored in memory locations 0900-0907. The program then compares the value in the accumulator (A) with OA (hexadecimal 10) to determine the key value.
 
+If the key value is A or higher, the program jumps to a different section. Otherwise, the program loads the DE register with the start of the display table. The program proceeds to find the first available blank memory location by iterating through memory and checking for a zero value. Once a blank location is found, the key value is increased by 80 and stored back into register E. This ensures that the DE register points to a specific table byte.
+
+Next, the program loads HL with the start of memory and searches for the blank memory location. When found, the byte pointed to by DE is loaded into register A, and the table value is stored in the blank memory location.
+
+To detect the same or a different button, the index register is modified by loading it with FF (hexadecimal) so that subsequent button presses can be identified.
+
+The scanning process begins at the left end of the display. HL is loaded with the start of memory, and the program initializes D with 06 to indicate six loops of the program. The delay value for turning on each digit is stored in register B.
+
+The program retrieves the data at the first memory location into register A, outputs it to the segment port, and loads C into A to output it to the cathode port. Register C is rotated right to access the second display, creating a short delay to display the digit. Register A is then zeroed, and the program outputs to the cathode port to turn off the display.
+
+The program increments to the next location, decrements the loop register (D), and jumps back to the start of the loop if D is not zero. If D is zero, indicating the end of the loop, the program jumps back to the start to look for a new key.
 
 
 ## TE-Dial-Alarm-2
