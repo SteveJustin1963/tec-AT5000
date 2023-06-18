@@ -42,6 +42,16 @@ The third program represents a significant increase in complexity compared to it
 
 It is emphasized that each program has been created from scratch, as it is challenging to modify an existing program. The recommended approach is to type each of these programs into the TEC (presumably a device or software) and diligently study their functioning, thereby facilitating a comprehensive understanding of their operations.
 
+In the first program of the Phone Dialer, certain limitations are present. The program can only display up to six digits on the TEC screen, as it lacks a scrolling feature. As numbers are pressed on the keyboard, they fill the screen from left to right. Once the screen is full, the program's capacity is reached.
+
+The screen buffer is located at memory address 0900, and the scan rate is determined by the value of B at addresses 082E and 082F. Adjusting the value of B and the TEC clock speed allows for increasing or reducing the scan rate.
+
+This program does not include any additional features. To enter a new number, the TEC must be reset, and the 'GO' button needs to be pressed, clearing the screen.
+
+The primary function of this simple program is to demonstrate how to retrieve numbers from the keyboard and display them on the screen.
+
+An unfamiliar instruction used in this program is JRNC, which stands for "Jump Relative if the Carry flag is NOT SET." When the preceding instruction is a 'COMPARE,' it can be helpful to substitute the term 'BORROW' for carry, making it easier to understand. This is because the compare instruction subtracts the data byte from the accumulator, and if a borrow is required, the carry flag is SET.
+
 ```
 PHONE DIALLER - Part I 
 
