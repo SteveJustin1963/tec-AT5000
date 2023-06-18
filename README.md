@@ -28,8 +28,19 @@ develop a telephone autodialer that draws inspiration from
 
 
 ## lets review the dialer
+from the magazie "Dialer" software TE14-pg16 
 
- 
+The following three to four pages explore the development of a Telephone Dialer concept, which possesses the capability to store approximately 30 to 40 names and corresponding phone numbers. The dialer includes features such as dialing functionality and auto redial. It is important to note that this concept is solely a program of ideas, and the output is conveyed through tones emitted from a speaker.
+
+Due to the ambitious nature of the concept, it has been divided into three distinct sections. Each section delineates a standalone program that increases in complexity, culminating in a complete design in the third section.
+
+The first program serves as a relatively simple introduction. It demonstrates the process of obtaining numerical input from the keyboard and subsequently displaying it on the screen.
+
+In the second program, two additional function buttons, namely 'C' and 'E,' are introduced. The 'C' button serves to clear the screen, while the 'E' button denotes the conclusion of inputting a phone number.
+
+The third program represents a significant increase in complexity compared to its predecessors. It incorporates a broader range of features and is designed to keep track of multiple variables and information.
+
+It is emphasized that each program has been created from scratch, as it is challenging to modify an existing program. The recommended approach is to type each of these programs into the TEC (presumably a device or software) and diligently study their functioning, thereby facilitating a comprehensive understanding of their operations.
 
 ```
 PHONE DIALLER - Part I 
