@@ -48,45 +48,47 @@ The scan rate of the program can be adjusted by modifying the value of register 
 ```
 PHONE DIALLER - Part I 
 
-LD D, 08 
-XOR A 
-LD HL,0900 
-LD (HL),A 
-INC HL 
-DEC D 
-JR NZ 
-LD A,I 
-CP 0A
-JR NC 
-LD DE 0880
-ADD A,E 
-LD E,A 
-LD HL,0900 
-LD A,(HL) 
-CP 00
-JR Z 
-INC HL 
-JR 
-LD A,(DE) 
-LD (HL),A 
-LD A,FF 
-LD I,A 
-LD C,20 
-LD HL,0900 
-LD D,06
-LD B,00
-LD A(HL) 
-OUT (02),A 
-LD A,C 
-OUT (01),A 
-RRC C 
-DJNZ 
-XOR A 
-OUT(01),A 
-INC HL 
-DEC D 
-JR NZ 
-JR 
+org     0800
+
+start   LD D, 08    ; The first 8 memory locations are cleared so that the program
+        XOR A       ; will come on with a blank screen. We need only 6 locations.
+        LD HL,0x0900 ; The 7th location is explained in the text. 
+L1      LD (HL),A   ; Register A is zeroed, and this value is inserted into 0900- 0907
+        INC HL      ; via the HL register, being the pointer register.   
+        DEC D 
+        JR NZ,L1 
+L2      LD A,I      ; The Index register contains the value of the key
+        CP 0x0A       ; Compare the accumulator with 0A
+        JR NC, B2   ; Jump relative if the key is A or higher
+        LD DE,0x0880 ; Load DE with the start of the DISPLAY TABLE
+        ADD A,E     ; Add 80 to the key value
+        LD E,A      ; Load the result back into E. DE will point to a table-byte
+        LD HL,0x0900  ; Load HL with the start of memory
+B1      LD A,(HL)   ; Look for the first blank memory location by loading the value
+        CP 0x00       ; pointed to by HL into the accumulator and comparing with
+        JR Z, F   ; zero until a blank location is found. 
+        INC HL 
+        JR B1
+F       LD A,(DE)   ; When found, load A with the byte pointed to by DE. 
+        LD (HL),A   ; Load the table value into the blank memory location.
+B2      LD A, 0xFF     ; Change the value of the index register by loading it with FF so
+        LD I,A      ; that we can detect the same or another button.
+        LD C,0x20     ; Start the scan at the left-hand end of the display. 
+        LD HL,0x0900  ; Load HL with the start of memory
+        LD D,0x06     ; Load D with 06 for 6 loops of the program
+L3      LD B,0x00     ; Load B with delay value for turning ON each digit. 
+        LD A,(HL)   ; Load the data at the first memory location into A.  
+        OUT (02),A  ; Output to the segment port
+        LD A,C      ; Load C into A
+        OUT (01),A  ; Output to the cathode port
+        RRC C       ; Rotate register C right to access the 2nd display 
+        DJNZ L3     ; Create a short delay to display the digit
+        XOR A       ; Zero A
+        OUT (01),A  ; Output to the cathode port to turn the display OFF
+        INC HL      ; Increment to the next location
+        DEC D       ; Decrement the loop register
+        JR NZ, L3   ; Jump to the start of the loop if D is not zero
+        JR L2       ; Jump to the start of the program if D is zero and look for a new key
 ```
 
 ## TE-Dial-Alarm-2
