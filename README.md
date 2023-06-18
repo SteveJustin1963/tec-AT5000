@@ -27,13 +27,13 @@ develop a telephone autodialer that draws inspiration from
 - "Dialer" software TE14-pg16 
 
 
-## lets review the dialer
-from the magazie "Dialer" software TE14-pg16 
+## from the magazie "Dialer" software TE14-pg16 
 
 The following three to four pages explore the development of a Telephone Dialer concept, which possesses the capability to store approximately 30 to 40 names and corresponding phone numbers. The dialer includes features such as dialing functionality and auto redial. It is important to note that this concept is solely a program of ideas, and the output is conveyed through tones emitted from a speaker.
 
 Due to the ambitious nature of the concept, it has been divided into three distinct sections. Each section delineates a standalone program that increases in complexity, culminating in a complete design in the third section.
 
+## PHONE DIALLER PROGRAM 1.
 The first program serves as a relatively simple introduction. It demonstrates the process of obtaining numerical input from the keyboard and subsequently displaying it on the screen.
 
 In the second program, two additional function buttons, namely 'C' and 'E,' are introduced. The 'C' button serves to clear the screen, while the 'E' button denotes the conclusion of inputting a phone number.
@@ -110,6 +110,36 @@ The scanning process begins at the left end of the display. HL is loaded with th
 The program retrieves the data at the first memory location into register A, outputs it to the segment port, and loads C into A to output it to the cathode port. Register C is rotated right to access the second display, creating a short delay to display the digit. Register A is then zeroed, and the program outputs to the cathode port to turn off the display.
 
 The program increments to the next location, decrements the loop register (D), and jumps back to the start of the loop if D is not zero. If D is zero, indicating the end of the loop, the program jumps back to the start to look for a new key.
+
+## PHONE DIALLER - Part 2
+
+The second part of the Phone Dialler program takes a different approach and introduces new features. This program allows for the input of a string of digits of any length and remembers them for recall after the 'E' (END) key is pressed. The 'C' button can be pressed at any time to clear the display. When the desired number has been entered, pressing the 'E' button blanks the display, and the numbers reappear from the right side of the display, shifting across to the left. Before the numbers start again, three empty spaces are created.
+
+In this program, the concept of control keys is introduced, along with the need for subroutines to handle repetitive sequences. As programs become more complex, the length increases due to additional housekeeping tasks. Housekeeping involves tasks such as detecting button presses or determining the end of a sequence.
+
+One of the primary requirements of the program is to keep the displays illuminated. This means that the SCAN routine is frequently called, and it often serves as a suitable location to incorporate housekeeping tasks.
+
+To ensure immediate responsiveness, keys need to be checked during the SCAN loop, specifically during the innermost loop, as this loop runs most frequently.
+
+To understand the program's behavior and specific locations, it is recommended to type it into the TEC and run it. By changing some of the memory locations and observing the results, one can gain a better understanding of the program's functioning.
+
+## HOW THE PROGRAM WORKS
+The program utilizes two memory areas. The first is the Display Buffer, consisting of 6 locations from 0900 to 0905. The Display Buffer is responsible for storing the digits to be displayed. The second memory area, starting from 0907 onwards, is called the Memory Area. It is an open-ended area where the program stores any number of digits as required.
+
+The SCAN ROUTINE, located at memory address 0877, examines the Display Buffer locations and outputs their values onto the displays. The remainder of memory, starting from 0907, holds the stored digits.
+
+Initially, the program sets aside one blank location, 0906. Its purpose will be explained later. As each number is entered, it is stored in the Memory Area starting from 0907. The HL register pair keeps track of the next available location in the Memory Area.
+
+Simultaneously, the number is displayed by outputting it onto the display. However, before that, a SHIFT ROUTINE is called. This routine shifts each digit in the Display Buffer one place to the left, effectively dropping the leftmost digit out of the buffer zone. This creates an empty space at the right-hand end of the display.
+
+To generate this empty space cleverly, the program shifts the '00' in memory location 0906 into the 6th buffer location. Then, the current key value is loaded into the buffer zone at position six, and the program resumes the scanning process, looking for the 'end of number' signal, which is triggered by pressing the 'E' button.
+
+Once the 'end of number' signal is detected, memory is incremented by one location, and the 'E' value is inserted. The displays are then cleared. The program retrieves the first digit at 0907 and places it in the 6th position of the buffer area. The SHIFT ROUTINE is called, and the next memory value is placed in the 6th buffer location.
+
+Before each new value is loaded into the buffer area, it is compared with OE (hexadecimal for 14) to detect the 'end of message' signal. When 'E' is detected, three blank locations are created, and the message starts again.
+
+The CLEAR function is incorporated within the SCAN routine to allow for instant detection. As the display scan must be running at all times to keep the displays illuminated, including the CLEAR function ensures its immediate responsiveness.
+
 
 
 ## TE-Dial-Alarm-2
