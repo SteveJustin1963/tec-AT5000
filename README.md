@@ -22,9 +22,9 @@ By combining these software and hardware elements, we aim to create a functional
 
 ## plan 
 develop a telephone autodialer that draws inspiration from 
-- the AT-5000 auto dialer featured in the Simpsons. 
-- hardware elements from the TE-Dial-Alarm-2. 
-- "Dialer" software TE14-pg16 
+- the AT-5000 auto dialer featured in the Simpsons
+- review and use hardware elements from TE-Dial-Alarm-2. see wiki
+- revier and use dialer software in TE14-pg16. see wiki
 
 
 
@@ -34,4 +34,23 @@ develop a telephone autodialer that draws inspiration from
 ![layout](https://user-images.githubusercontent.com/58069246/205056653-5459de57-910f-4eac-83e6-3f8193f32d24.png)
 
 ![image](https://user-images.githubusercontent.com/58069246/209416173-8975d636-3432-493c-9972-6893980a00f0.png)
+
+## Iterate
+- learn how dtmf is done 
+  - on the pic chip
+  - on the z80, 
+  - in the monitor code; makes tones a well as some games. 
+  - generating it and detecting it are two diff things.
+- dialin with a mobile phone (or radio) then send dtmf that is deocoded for control
+
+
+
+ 
+## Ref
+- http://www.talkingelectronics.com/projects/Elektor/Dial%20Alarm-2/DialAlarm-2.html
+- pg16  https://github.com/SteveJustin1963/tec-BOOKS/blob/master/TE/Mag/talking_electronics_14.pdf
+- https://www.youtube.com/watch?v=9rh50BSv_CE
+
+![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/feds.png)
+
 
