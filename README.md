@@ -1,5 +1,5 @@
 # tec-AT5000
-## warnings
+## warning pls read wiki
 https://github.com/SteveJustin1963/tec-AT5000/wiki
 
 
