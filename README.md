@@ -1,7 +1,5 @@
 # tec-AT5000
-## warning pls read wiki
-https://github.com/SteveJustin1963/tec-AT5000/wiki
-
+ 
 
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mp1.png)
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/mpad1.png)
