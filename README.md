@@ -13,9 +13,9 @@ For the design of our autodialer, we will refer to the AT5000 Power Dialer as de
 - Display: The tec1 LEDs will serve as the display for our autodialer.
 - Tape: The tec1 keypad will feature a left/right knob for tape control.
 - Speaker: We will utilize the tec1 speaker for audio output.
-- Back: Our autodialer will have an RJ45 connector at the back.
+- Back: Our autodialer will have an RJ45 connector at the back., more advance way is to couple to a voip account
 - Circuit: The circuitry will include components such as a microphone, opto coupler, diode bridge, and DTMF decoder.
-- Voice: We will incorporate the LX20LYA voice audio module, providing a 20-second voice capability.
+- Voice: We will incorporate the LX20LYA voice audio module, providing a 20-second voice capability. keep the last 5 seconds of sounds in high speed rewind for that retro effect
 
 By combining these software and hardware elements, we aim to create a functional and inspired autodialer reminiscent of the AT-5000 from the Simpsons.
 
