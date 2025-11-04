@@ -51,6 +51,9 @@ develop a telephone autodialer that draws inspiration from
 - pg16  https://github.com/SteveJustin1963/tec-BOOKS/blob/master/TE/Mag/talking_electronics_14.pdf
 - https://www.youtube.com/watch?v=9rh50BSv_CE
 
+** Ill waiti till this cop goes and ill grab my AT5000..**
+
+
 ![](https://github.com/SteveJustin1963/tec-AT5000/blob/master/pics/feds.png)
 
 
