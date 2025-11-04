@@ -7,6 +7,8 @@
 For the design of our autodialer, we will refer to the AT5000 Power Dialer as described on the Wikipedia page. We will carefully select the desired features from the AT5000 and determine the best approach to combine them. The selected features include:
 
 - Indicators: We will utilize the tec1 LEDs to indicate functions such as play, record, dial, redial, and power.
+- use a old Veeder-Root counter for the first 5 digits...
+- use as much old retro tech
 - Buttons: The tec1 keypad will incorporate buttons for play, record, power, keypad, 100, manual, auto, and tape-red.
 - Display: The tec1 LEDs will serve as the display for our autodialer.
 - Tape: The tec1 keypad will feature a left/right knob for tape control.
