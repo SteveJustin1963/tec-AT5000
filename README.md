@@ -61,21 +61,24 @@ See the project Wiki for ongoing updates and schematics.
 |------------------------|--------------|-------|
 | **CPU Board** | TEC-1 or compatible Z80 SBC | Core control unit |
 | **DTMF Decoder** | MT8870 or CM8870 | Converts tone to digital nibble |
+| **DTMF Generator** | TP5089 or HT9200B | Tone transmission to line |
 | **Voice Module** | LX20LYA 20 s recorder/player | For retro message playback |
 | **Display** | TEC-1 LED array | Status indicators |
 | **Keypad** | TEC-1 hex keypad | Multifunction input |
 | **Counter** | Veeder-Root 5-digit mechanical | Real mechanical feedback |
+| **Counter Driver** | NPN transistor (e.g. 2N2222) + 1N4007 flyback diode | Z80 cannot drive counter directly |
 | **Audio Out** | Piezo / speaker | For tone output and FX |
 | **Opto-Isolator** | 4N25 or similar | Line isolation |
-| **Interface Jack** | RJ-45 / RJ-11 | Analog or VoIP connection |
+| **Interface Jack** | RJ-11 | Analog POTS line — not RJ-45 |
 | **Bridge Rectifier** | 1N4148 × 4 | Line protection |
 | **Microphone Input** | Electret capsule | Audio sensing |
 | **Power Supply** | 5 V regulated | Shared with TEC-1 mainboard |
+| **Decoupling Caps** | 100 nF ceramic × 4 (min) | One per IC — MT8870, TP5089, 4N25, LX20LYA |
+| **Crystal / Clock** | 3.58 MHz (NTSC colour burst) | Required reference for TP5089 |
 | **Misc.** | Potentiometers, knobs, retro dials | For tape / control feel |
 
-Additional modules under consideration:  
-- **DTMF generator** IC (e.g., TP5089 or HT9200B) for tone transmission  
-- Optional **Bluetooth-to-VoIP adapter** for modern integration
+Additional modules under consideration:
+- Optional external ATA (Analog Telephone Adapter) box for VoIP — do not attempt VoIP on the Z80 directly
 
 ---
 
@@ -105,6 +108,32 @@ Additional modules under consideration:
 - Publish full schematics, firmware, and build guide.  
 - Document calibration and tone frequency testing.  
 - Create demonstration video and printable front-panel artwork.
+
+---
+
+## Hardware Issues — What Needs Fixing
+
+### Must Fix
+
+1. **RJ-45 → RJ-11** — wrong connector for analog phone line; physically incompatible with POTS
+2. **Veeder-Root driver circuit missing** — needs NPN transistor + flyback diode between Z80 output port and counter coil; Z80 cannot drive it directly
+3. **MT8870 ↔ Z80 interface not designed** — need to define:
+   - Which I/O port address
+   - How STD strobe is handled (interrupt or polled)
+   - How 4-bit nibble (Q1–Q4) connects to the data bus
+4. **DTMF generator output path undefined** — TP5089/HT9200B audio output needs to feed back through the opto-isolator to the phone line; signal path not yet defined
+
+### Decide Before Building
+
+5. **VoIP path** — either commit to an external ATA box or drop from v1 scope; "Bluetooth-to-VoIP adapter" is a placeholder, not a design
+6. **Software vs hardware DTMF generation** — pick one: Z80 tone loops or TP5089 IC; implementing both without a clear reason adds unnecessary complexity
+
+### Missing from BOM
+
+7. NPN transistor for Veeder-Root driver (e.g. 2N2222)
+8. Flyback diode for counter coil (e.g. 1N4007)
+9. Decoupling capacitors for MT8870, TP5089, 4N25, LX20LYA (100 nF per IC minimum)
+10. 3.58 MHz crystal / clock reference required by TP5089
 
 ---
 
