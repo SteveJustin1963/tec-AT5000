@@ -108,6 +108,43 @@ Additional modules under consideration:
 
 ---
 
+## Project Assessment — What's Right and Wrong
+
+### What's Right
+
+| Item | Notes |
+|------|-------|
+| MT8870 DTMF decoder | Industry-standard, correct choice |
+| Opto-isolator (4N25) | Essential for phone line isolation — correct |
+| Diode bridge | Correct line polarity protection |
+| LX20LYA voice module | Real, appropriate 20s recorder/player |
+| TP5089 / HT9200B DTMF generator | Legitimate ICs for tone transmission |
+| TEC-1 as controller | Feasible for this complexity level |
+| Separate decode / generate ICs | Architecturally correct — don't mix roles |
+| Simulate before hardware | Right approach for development order |
+
+### What's Wrong
+
+**Hardware / BOM:**
+- **RJ-45 listed instead of RJ-11** — analog POTS lines use RJ-11; these are physically different connectors
+- **No Veeder-Root driver circuit** — the Z80 cannot drive a mechanical counter directly; needs transistor + flyback diode
+- **VoIP path undefined** — "Bluetooth-to-VoIP adapter" is not a real design; needs either an ATA box or drop VoIP from v1 scope
+- **No Z80 ↔ MT8870 interface defined** — port address, STD strobe handling, and polling/interrupt strategy all missing
+
+**Software:**
+- **No DTMF tone generation routine** — the existing code is a display handler only, not a dialler
+- **No MT8870 read routine** — nothing decodes the incoming 4-bit nibble
+
+**Assembly code (`PHONE-DIALLER-Part 1.z80`):**
+- 7 jump instructions with no target labels — will not assemble
+- `I` register misused as data storage — corrupts the interrupt vector
+- `LD A(HL)` and `LD DE 0880` — missing commas, syntax errors
+- `ADD A,E` for table offset — 8-bit only, fragile
+- `B = 00` passed to `DJNZ` — loops 256 times, likely unintentional
+- Code appears to be a raw OCR transcription from TE14 p.16, never assembled or tested
+
+---
+
 ## Current Code Flow (Faulty — PHONE-DIALLER-Part 1.z80)
 
 ```
