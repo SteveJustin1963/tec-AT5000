@@ -567,6 +567,53 @@ Used for **local feedback only** — key press beeps, error tones, status sounds
 
 ---
 
+## Current Project Status
+
+### What's Done
+
+| Item | Status |
+|------|--------|
+| All assembly bugs fixed in PHONE-DIALLER-Part 1.z80 | ✓ |
+| I/O port map defined | ✓ |
+| MT8870 poll routine written | ✓ |
+| DTMF dial via TP5089 implemented | ✓ |
+| Veeder-Root driver designed | ✓ |
+| LX20LYA record/play implemented | ✓ |
+| RJ-11 corrected (was RJ-45) | ✓ |
+| Full circuit diagram drawn | ✓ |
+| dial2.z80 — all 19 modules implemented and assembles clean | ✓ |
+
+---
+
+### Hardware — Physical Work Still Needed
+
+- [ ] Breadboard line interface — diode bridge + 4N25 opto, verify isolation
+- [ ] Test MT8870 — send DTMF tones, confirm Q1–Q4 nibble and STD strobe
+- [ ] Test TP5089 — verify 3.58 MHz crystal, confirm tones on scope or DTMF decoder app
+- [ ] Test LX20LYA — record/playback standalone before connecting to Z80
+- [ ] Test Veeder-Root driver — 2N2222 + 1N4007, verify counter steps cleanly
+- [ ] Verify TEC-1 keypad port — dial2.z80 assumes port 00h returns key code directly; real TEC-1 may need matrix scan routine
+
+### Software — Still To Do
+
+- [ ] Fill tone table values — PHONE-DIALLER-Part 1.z80 table at 0880h is all zeros, needs real values from TE14 p.16
+- [ ] Replace keypad stub — swap `in a, (PORT_KEY)` with actual TEC-1 matrix scan routine
+- [ ] Busy tone detection — currently not implemented, simple timeout used instead
+- [ ] Configurable retry counter — no retry on busy/no-answer yet
+- [ ] Test dial2.z80 on real hardware or MAME TEC-1 emulator
+
+### Documentation — Still To Do
+
+- [ ] Update todo.md to reflect completed items
+- [ ] Draw PCB or stripboard layout once breadboard tests pass
+- [ ] Front panel artwork for retro AT-5000 aesthetic
+
+### Open Decision
+
+- **VoIP** — still undecided. Recommend dropping from v1 and doing pure POTS. Revisit after hardware proves out.
+
+---
+
 ## Complete Code Plan — dial2.z80
 
 ### Modules
