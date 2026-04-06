@@ -567,6 +567,56 @@ Used for **local feedback only** — key press beeps, error tones, status sounds
 
 ---
 
+## What the Code Does — Plain English
+
+The program is a **phone digit display driver**. It sits in a loop waiting for someone to give it a digit to display, then shows it on the TEC-1's LED display.
+
+### Startup
+
+When the TEC-1 powers on, the code first **wipes the display buffer** — six memory locations that hold what's currently shown on the LEDs. It sets them all to zero so the display comes up blank.
+
+It then sets a **sentinel value (FFh)** in a memory location called `DIGIT_REG`. This is a flag meaning *"no digit waiting yet"*.
+
+### Waiting for a Digit
+
+The code sits in a tight loop, constantly reading `DIGIT_REG`. It's waiting for something else (an interrupt routine, not shown here) to write a digit 0–9 into that location.
+
+As long as `DIGIT_REG` is FFh — or anything 10 or above — it just keeps looping and does nothing.
+
+### When a Digit Arrives
+
+The moment a valid digit (0–9) appears in `DIGIT_REG`, the code:
+
+1. **Looks up the tone pattern** for that digit in a table stored at address `0880h`. Each digit has a corresponding byte that encodes how to display or sound it.
+2. **Finds an empty slot** in the 6-byte display buffer by scanning through it until it finds a zero byte.
+3. **Writes the tone/display byte** into that empty slot.
+4. **Resets `DIGIT_REG` back to FFh** — signalling *"I've processed that digit, ready for the next one"*.
+
+### Driving the Display
+
+It then runs the **multiplexed display routine**. The TEC-1 has 6 LED digit positions but they aren't all driven at once — they're switched on one at a time, very rapidly, so they appear simultaneously lit to the human eye.
+
+For each of the 6 digit positions it:
+1. Sends the **segment pattern** (which segments to light) to port 02h
+2. Switches **that digit's select line on** via port 01h
+3. Holds it on for **128 cycles** (display brightness timing)
+4. Switches the **digit select off**
+5. Rotates the select pattern to the **next digit**
+6. Moves to the **next byte** in the buffer
+
+After all 6 digits have been shown once, it loops straight back to check for the next incoming digit.
+
+### In One Sentence
+
+> It waits for a digit to arrive in a memory location, looks up its display pattern, slots it into the display buffer, then continuously refreshes the 6-digit LED display in a loop.
+
+### What's Missing
+
+- The **interrupt handler** that writes digits into `DIGIT_REG` (would come from keypad or MT8870 DTMF decoder)
+- The actual **tone pattern values** in the lookup table at `0880h` — currently all placeholder zeros, needs filling from TE14 p.16 spec
+
+---
+
 ## Corrected Code Flow (PHONE-DIALLER-Part 1.z80)
 
 ```
