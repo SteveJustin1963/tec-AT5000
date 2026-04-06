@@ -314,6 +314,119 @@ They are independent paths — the MT8870 handles incoming digits (remote contro
 
 ---
 
+## TEC-1 Z80 CPU — I/O Port Map Explained
+
+The Z80 communicates with all peripherals via **IN** and **OUT** instructions targeting port addresses. Each port is an 8-bit data bus connection to a specific device.
+
+---
+
+### Port 00 — Keypad (INPUT)
+
+```
+  Port 00 ◄───────────────── Keypad scan
+```
+
+The Z80 reads Port 00 to scan the TEC-1 hex keypad. The keypad is matrix-wired — the CPU reads back which key is currently pressed as a byte value. Used for entering phone digits, selecting functions (Play, Record, Dial etc.).
+
+---
+
+### Port 01 — LED Array (OUTPUT)
+
+```
+  Port 01 ────────────────► LED array
+```
+
+The Z80 writes a byte to Port 01 to drive the TEC-1 seven-segment LED displays. Each bit controls a segment or selects which digit is active. The display routine multiplexes across all digits rapidly so they appear simultaneously lit.
+
+---
+
+### Port 02 — Speaker / Tone (OUTPUT)
+
+```
+  Port 02 ────────────────► Speaker/tone
+```
+
+The Z80 toggles bits on Port 02 at timed intervals to generate square wave tones through the TEC-1 speaker — used for status beeps and feedback sounds. Note: **DTMF tones for dialling come from the TP5089, not this port** — Port 02 is for local audio FX only.
+
+---
+
+### Port 03 — MT8870 DTMF Decoder (INPUT)
+
+```
+  Port 03 ◄─── MT8870 Q1–Q4 + STD
+```
+
+The Z80 reads Port 03 to get the incoming DTMF digit. The lower 4 bits (Q1–Q4) carry the digit nibble. STD is also monitored here (or via /INT) to know when the nibble is valid. Typical read sequence:
+
+```
+  /INT fires → Z80 interrupt handler → IN A,(03H) → mask lower nibble → process digit
+```
+
+---
+
+### Port 04 — LX20LYA Voice Module (OUTPUT)
+
+```
+  Port 04 ────────────────► LX20LYA ctrl
+```
+
+Individual bits control the voice module's function pins:
+
+| Bit | Function |
+|-----|----------|
+| 0   | PLAY — trigger message playback |
+| 1   | REC  — trigger record mode |
+| 2   | /CE  — chip enable (active low) |
+
+The Z80 pulses these lines to start/stop recording or playback of the 20-second voice message.
+
+---
+
+### Port 05 — Veeder-Root Counter Driver (OUTPUT)
+
+```
+  Port 05 ────────────────► VR counter drv
+```
+
+The Z80 writes a pulse to Port 05 to advance the mechanical counter by one digit. A single bit toggles high then low — the 2N2222 transistor amplifies this to drive the counter coil. The Z80 cannot drive the coil directly (too much current); the transistor handles that.
+
+---
+
+### Port 06 — TP5089 DTMF Generator (OUTPUT)
+
+```
+  Port 06 ────────────────► TP5089 D0–D3
+```
+
+The Z80 writes a 4-bit digit code to Port 06. The lower nibble (D0–D3) selects which DTMF tone pair the TP5089 synthesises and transmits to the phone line. To dial a number the Z80 writes each digit in sequence with appropriate inter-digit timing gaps.
+
+---
+
+### /INT — Interrupt Line (INPUT)
+
+```
+  /INT ◄─── MT8870 STD
+```
+
+The MT8870's STD pin is wired directly to the Z80's maskable interrupt (/INT). When a valid DTMF tone is detected, STD pulses and the Z80 immediately vectors to the interrupt service routine to read Port 03 — no polling loop needed, no digits missed.
+
+---
+
+### Port Map Summary
+
+| Port | Dir | Connected To | Purpose |
+|------|-----|-------------|---------|
+| 00 | IN  | Keypad | Read key presses |
+| 01 | OUT | LED array | Drive display |
+| 02 | OUT | Speaker | Local audio / beeps |
+| 03 | IN  | MT8870 Q1–Q4 | Read incoming DTMF digit |
+| 04 | OUT | LX20LYA | Control voice module |
+| 05 | OUT | 2N2222 base | Pulse Veeder-Root counter |
+| 06 | OUT | TP5089 D0–D3 | Send outgoing DTMF digit |
+| /INT | IN | MT8870 STD | Interrupt on digit arrival |
+
+---
+
 ## Hardware Issues — What Needs Fixing
 
 ### Must Fix
