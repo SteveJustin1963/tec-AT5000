@@ -195,6 +195,57 @@ Additional modules under consideration:
 
 ---
 
+## Line Interface Explained
+
+### Diode Bridge (1N4148 × 4)
+
+```
+  TIP ──┬──[D1>]──┬── A
+        │         │
+      [D2<]     [D3>]
+        │         │
+  RNG ──┴──[D4<]──┴── B
+```
+
+A phone line can present with either polarity — the exchange decides which way round TIP and RING are. The four diodes form a **bridge rectifier** so regardless of polarity, point **A is always positive** and **B is always negative (GND_ISO)**. The circuit works correctly whichever way the line is connected.
+
+The `>` and `<` show diode direction (anode → cathode).
+
+---
+
+### 4N25 #1 — Line RX (phone → TEC-1)
+
+```
+  A───/\/\/──────────────┤ A  ▷│   C ──────── AUDIO_RX
+               C1 100nF  │             E ┤
+  B (GND_ISO) ──┤|├─────┤ K       GND ──┘
+```
+
+- **R1 (470Ω)** limits current through the opto LED
+- **C1 (100nF)** — the capacitor symbol `┤|├` — AC-couples the audio. DC from the line drives the opto LED steady, but the **audio signal (AC) modulates the LED current**, causing the phototransistor output to follow the audio
+- The phototransistor collector outputs **AUDIO_RX** — an electrically isolated copy of the phone audio — which feeds into the MT8870 DTMF decoder
+- **GND_ISO** (line-side ground) never touches digital GND — the opto provides the galvanic isolation barrier
+
+---
+
+### 4N25 #2 — Line TX (TEC-1 → phone)
+
+```
+  TP5089 TONE OUT ──[C2 100nF]──[R2 1kΩ]──┐
+                                            └─►A  ▷│  C ──── A (line)
+                                              K       E ── GND_ISO
+```
+
+This works in reverse — the **TP5089 DTMF generator** produces audio tones, which are:
+- AC-coupled through **C2** (blocks any DC offset)
+- Current-limited by **R2 (1kΩ)**
+- Driven into the LED of 4N25 #2
+- The phototransistor on the isolated side injects the tone signal back onto the phone line
+
+The two optos keep the phone line and the digital circuit **completely electrically separate** in both directions — a legal and safety requirement for anything connecting to POTS.
+
+---
+
 ## Hardware Issues — What Needs Fixing
 
 ### Must Fix
