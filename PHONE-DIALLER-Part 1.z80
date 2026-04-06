@@ -1,43 +1,122 @@
+;================================================================
+; PHONE DIALLER — Part 1  (corrected)
+; TEC-1 Z80 SBC
+;
+; Original source: Talking Electronics Issue 14, p.16
+; Fixes applied:
+;   - Added all missing jump labels
+;   - Replaced I register misuse with RAM byte at DIGIT_REG
+;   - Fixed ADD A,E → proper 16-bit ADD HL,DE for table lookup
+;   - Fixed LD DE 0880 → LD DE,TONE_TBL (missing comma + label)
+;   - Fixed LD A(HL) → LD A,(HL) (missing comma)
+;   - Moved RRC C outside inner loop (was rotating 256x per digit)
+;   - Changed B=00 (256 iterations) → B=80H (128) with clear comment
+;   - Save tone byte in B during buffer scan to avoid clobbering A
+;   - Added DIGIT_REG initialisation on startup
+;   - Added H suffixes to all hex literals
+;
+; RAM map:
+;   0900h–0905h  display/tone buffer (6 bytes, one per digit position)
+;   0906h–0907h  spare
+;   090Fh        digit register (FFh = no digit pending)
+;
+; I/O ports:
+;   Port 01h     digit select  (LED multiplexing)
+;   Port 02h     segment data
+;================================================================
 
-start LD D, 08  ;The first 8 memory locations are cleared so that the program
-                ;will come on with a blank screen. We need only 6 locations.
-                ;The 7th location is explained in the text. 
-      XOR A 
-      LD HL,0900  
-      LD (HL),A ;Register A is zeroed and this value is inserted into 0900- 0907
-                ;via the HL register being the pointer register.   
-      INC HL 
-DEC D 
-JR NZ 
-LD A,I 
-CP 0A
-JR NC 
-LD DE 0880
-ADD A,E 
-LD E,A 
-LD HL,0900 
-LD A,(HL) 
-CP 00
-JR Z 
-INC HL 
-JR 
-LD A,(DE) 
-LD (HL),A 
-LD A,FF 
-LD I,A 
-LD C,20 
-LD HL,0900 
-LD D,06
-LD B,00
-LD A(HL) 
-OUT (02),A 
-LD A,C 
-OUT (01),A 
-RRC C 
-DJNZ 
-XOR A 
-OUT(01),A 
-INC HL 
-DEC D 
-JR NZ 
-JR 
+DIGIT_REG   EQU 090FH       ; replaces misuse of I register
+BUF         EQU 0900H       ; display/tone buffer base
+TONE_TBL    EQU 0880H       ; tone pattern lookup table
+BUF_LEN     EQU 06H         ; number of display digits
+PORT_SEG    EQU 02H         ; segment data port
+PORT_SEL    EQU 01H         ; digit select port
+
+            ORG 0800H
+
+START:
+            ;--- Clear display buffer (8 bytes) ---
+            LD D,08H
+            XOR A
+            LD HL,BUF
+CLEAR:
+            LD (HL),A
+            INC HL
+            DEC D
+            JR NZ,CLEAR
+
+            ;--- Initialise digit register to sentinel (no digit pending) ---
+            LD A,0FFH
+            LD (DIGIT_REG),A
+
+MAIN:
+            ;--- Wait for valid digit (0-9) ---
+            LD A,(DIGIT_REG)
+            CP 0AH
+            JR NC,MAIN          ; FFh or >= 10: no digit yet, loop
+
+            ;--- Look up tone byte in table (16-bit safe) ---
+            LD HL,TONE_TBL
+            LD E,A
+            LD D,00H
+            ADD HL,DE           ; HL = TONE_TBL + digit (full 16-bit add)
+            LD A,(HL)           ; A = tone byte for this digit
+            LD B,A              ; save tone byte — A will be clobbered by buffer scan
+
+            ;--- Find empty slot in buffer ---
+            LD HL,BUF
+FIND_SLOT:
+            LD A,(HL)
+            CP 00H
+            JR Z,STORE          ; empty slot found
+            INC HL
+            JR FIND_SLOT
+
+STORE:
+            ;--- Write tone byte into empty slot ---
+            LD (HL),B           ; B holds tone byte saved before scan
+
+            ;--- Reset digit register to sentinel ---
+            LD A,0FFH
+            LD (DIGIT_REG),A
+
+DISPLAY:
+            ;--- Multiplex display across 6 digit positions ---
+            LD C,20H            ; digit select: start at bit 5
+            LD HL,BUF
+            LD D,BUF_LEN        ; outer loop: 6 positions
+DISP_OUTER:
+            LD A,(HL)
+            OUT (PORT_SEG),A    ; output segment data for this digit
+            LD A,C
+            OUT (PORT_SEL),A    ; switch on this digit's select line
+            LD B,80H            ; inner loop: 128 cycles display hold time
+DISP_INNER:
+            DJNZ DISP_INNER     ; timing delay — adjust B for brightness
+            XOR A
+            OUT (PORT_SEL),A    ; blank digit select before moving on
+            RRC C               ; advance select to next digit position
+            INC HL
+            DEC D
+            JR NZ,DISP_OUTER   ; next digit
+
+            JR MAIN             ; back to check for next incoming digit
+
+;----------------------------------------------------------------
+; Tone lookup table — 0880h
+; One byte per digit (0-9), value = segment/tone pattern
+; Populate with correct values from TE14 p.16 hardware spec
+;----------------------------------------------------------------
+            ORG TONE_TBL
+TONE_0:     DEFB 00H            ; digit 0
+TONE_1:     DEFB 00H            ; digit 1
+TONE_2:     DEFB 00H            ; digit 2
+TONE_3:     DEFB 00H            ; digit 3
+TONE_4:     DEFB 00H            ; digit 4
+TONE_5:     DEFB 00H            ; digit 5
+TONE_6:     DEFB 00H            ; digit 6
+TONE_7:     DEFB 00H            ; digit 7
+TONE_8:     DEFB 00H            ; digit 8
+TONE_9:     DEFB 00H            ; digit 9
+
+            END
