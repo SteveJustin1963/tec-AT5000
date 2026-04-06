@@ -108,6 +108,225 @@ Additional modules under consideration:
 
 ---
 
+## Current Code Flow (Faulty — PHONE-DIALLER-Part 1.z80)
+
+```
+  PHONE-DIALLER-Part 1.z80 — Code Flow (with faults marked)
+  ==========================================================
+
+  START
+    │
+    ├─ D = 08
+    ├─ A = 0  (XOR A)
+    └─ HL = 0900h
+         │
+         ▼
+  ┌─────────────────┐
+  │  (HL) = 0       │  ← clear memory 0900h–0907h
+  │  HL++           │
+  │  D--            │
+  └────────┬────────┘
+           │
+           │ [JR NZ] ◄── BUG: no label, won't assemble
+           │  loop until D=0
+           │
+           ▼
+  ┌─────────────────┐
+  │  A = I          │  ◄── BUG: I is interrupt vector register,
+  │                 │         not a data register. Corrupts interrupts.
+  └────────┬────────┘
+           │
+           ▼
+  ┌─────────────────┐
+  │  A >= 0Ah ?     │  (CP 0A)
+  └────┬───────┬────┘
+       │ YES   │ NO
+       │       │
+       ▼       │   [JR NC] ◄── BUG: no label — jump destination unknown
+  (exit/err?)  │
+               ▼
+  ┌─────────────────┐
+  │  DE = 0880h     │  (tone lookup table base)
+  │  E = E + A      │  ◄── BUG: ADD A,E only adds low byte;
+  │                 │         no carry into D — table limited to 256 bytes
+  └────────┬────────┘
+           │
+           ▼
+  ┌─────────────────┐
+  │  HL = 0900h     │
+  │  A = (HL)       │
+  │  A == 0 ?       │  (find empty slot in buffer)
+  └────┬───────┬────┘
+       │ NO    │ YES
+       │       │
+       │       │   [JR Z] ◄── BUG: no label
+       │       ▼
+       │   (slot found)
+       │
+       │ [INC HL]
+       └──► [JR] ◄──── BUG: no label — infinite loop?
+                        loops back to CP 00 presumably
+
+           ▼ (slot found)
+  ┌─────────────────┐
+  │  (HL) = (DE)    │  store tone byte into buffer
+  └────────┬────────┘
+           │
+           ▼
+  ┌─────────────────┐
+  │  A = FFh        │
+  │  I = A          │  ◄── BUG: resets interrupt vector to FFxxh
+  └────────┬────────┘
+           │
+           ▼
+  ┌─────────────────┐
+  │  C = 20h        │  (output select pattern)
+  │  HL = 0900h     │
+  │  D = 06         │  (outer loop: 6 display positions)
+  │  B = 00         │  ◄── NOTE: B=0 means DJNZ loops 256 times
+  └────────┬────────┘
+           │
+           ▼
+  ┌─────────────────────────────────┐
+  │  A = (HL)    → OUT (02), A      │  ← port 02: segment data
+  │  A = C       → OUT (01), A      │  ← port 01: digit select
+  │  RRC C                          │  rotate select pattern
+  │  B--                            │
+  └──────────────┬──────────────────┘
+                 │
+         [DJNZ] ◄── BUG: no label
+         loop 256x
+                 │
+                 ▼
+  ┌─────────────────┐
+  │  A = 0 (XOR A)  │
+  │  OUT (01), A    │  ← blank digit select
+  │  HL++           │
+  │  D--            │
+  └────────┬────────┘
+           │
+           │ [JR NZ] ◄── BUG: no label
+           │  loop until D=0 (6 display positions done)
+           │
+           ▼
+        [JR] ◄──────────── BUG: no label — probably meant to
+                            restart main loop, but destination unknown
+
+
+  FAULTS SUMMARY
+  ──────────────
+  1. JR NZ  (init loop)       — no target label
+  2. JR NC  (digit range chk) — no target label
+  3. JR Z   (find slot)       — no target label
+  4. JR     (slot scan loop)  — no target label
+  5. DJNZ   (inner output)    — no target label
+  6. JR NZ  (outer output)    — no target label
+  7. JR     (main restart)    — no target label
+  8. LD A,I / LD I,A          — misuse of interrupt vector register
+  9. LD A(HL)                 — missing comma
+ 10. LD DE 0880               — missing comma
+ 11. ADD A,E                  — only 8-bit offset; table walk is fragile
+ 12. B = 00                   — DJNZ loops 256x, likely unintentional
+```
+
+---
+
+## Hardware Flow
+
+```
+                         tec-AT5000 Hardware Flow
+                         ========================
+
+         PHONE LINE (POTS)
+         ┌─────────────┐
+         │   RJ-11     │
+         │  Line Jack  │
+         └──────┬──────┘
+                │ analog audio + DC
+                ▼
+         ┌─────────────┐
+         │   Diode     │
+         │   Bridge    │  ← line polarity protection
+         └──────┬──────┘
+                │
+                ▼
+         ┌─────────────┐
+         │  Opto-      │
+         │  Isolator   │  ← galvanic isolation (4N25)
+         │  (4N25)     │
+         └──────┬──────┘
+                │
+        ┌───────┴────────┐
+        │                │
+        ▼                ▼
+ ┌────────────┐   ┌────────────┐
+ │  MT8870    │   │  TP5089 /  │
+ │  DTMF      │   │  HT9200B   │
+ │  Decoder   │   │  DTMF Gen  │
+ └─────┬──────┘   └─────┬──────┘
+       │ 4-bit          │ tone out
+       │ nibble         │
+       │ + STD          │
+       │                │
+       └────────┬───────┘
+                │ I/O ports
+                ▼
+         ┌─────────────────────────────────────────┐
+         │                                         │
+         │         TEC-1  Z80  CPU                 │
+         │                                         │
+         │  I/O port map:                          │
+         │    Port 00 → keypad scan                │
+         │    Port 01 → LED / segment drive        │
+         │    Port 02 → speaker / tone out         │
+         │    Port 03 → MT8870 nibble + STD        │
+         │    Port 04 → LX20LYA control lines      │
+         │    Port 05 → Veeder-Root counter pulse  │
+         │    Port 06 → TP5089 digit select        │
+         │                                         │
+         └──┬──────┬──────┬──────┬──────┬──────┬──┘
+            │      │      │      │      │      │
+            ▼      ▼      ▼      ▼      ▼      ▼
+       ┌──────┐ ┌─────┐ ┌─────┐ ┌────────────────┐
+       │ TEC-1│ │TEC-1│ │TEC-1│ │   Veeder-Root  │
+       │Keypad│ │ LED │ │Spkr │ │ Mech. Counter  │
+       │      │ │Array│ │     │ │  (5 digits)    │
+       └──────┘ └─────┘ └──┬──┘ └───────┬────────┘
+                            │            │
+                            │            │ pulse via
+                            │            │ transistor
+                            │            │ driver
+                            ▼            ▼
+                       ┌─────────┐  ┌──────────┐
+                       │ LX20LYA │  │  NPN +   │
+                       │  Voice  │  │ flyback  │
+                       │ Module  │  │  diode   │
+                       │ (20 s)  │  └──────────┘
+                       └────┬────┘
+                            │
+                            ▼
+                       ┌─────────┐
+                       │  Mic /  │
+                       │ Speaker │
+                       └─────────┘
+
+  LEGEND
+  ──────
+  → data / control signals
+  ── audio / analog signals
+  (all digital I/O via Z80 bus)
+```
+
+**Key signal paths:**
+- **Inbound:** Phone line → bridge → opto → MT8870 → Z80 (digit received)
+- **Outbound:** Z80 → TP5089 → opto → line (dial tones sent)
+- **Voice:** Z80 triggers LX20LYA → speaker (recorded message plays)
+- **Mechanical:** Z80 pulses transistor driver → Veeder-Root counter advances
+
+> Note: I/O port map is provisional — finalise once free TEC-1 ports are confirmed.
+
+---
+
 ## References
 
 - [Talking Electronics – Dial Alarm 2](http://www.talkingelectronics.com/projects/Elektor/Dial%20Alarm-2/DialAlarm-2.html)  
