@@ -427,6 +427,83 @@ The MT8870's STD pin is wired directly to the Z80's maskable interrupt (/INT). W
 
 ---
 
+## Output Peripherals Explained
+
+### 5. LX20LYA — Voice Module (Port 04)
+
+```
+  bit0 ──► PLAY
+  bit1 ──► REC   LX20LYA
+  bit2 ──► /CE
+  SPKR ──► Speaker out
+  +5V ──[100nF]── GND
+```
+
+The Z80 controls the LX20LYA by setting individual bits on Port 04:
+
+- **bit0 → PLAY** — pulse high to trigger playback. The module plays autonomously once triggered; the Z80 doesn't need to do anything further
+- **bit1 → REC** — pulse high to start recording from the on-board microphone. Hold high for the duration of recording, then pull low to stop
+- **bit2 → /CE** — chip enable, **active low**. Must be pulled low to enable the module before issuing PLAY or REC
+- **SPKR** — the module drives the speaker directly from its own internal amplifier; the Z80 doesn't generate audio
+- **100nF decoupling cap** — sits on the VDD pin to keep the supply clean during playback current peaks
+
+Typical sequence: Z80 sets /CE low → sets PLAY high → module speaks pre-recorded message → Z80 sets PLAY low when done.
+
+---
+
+### 6. Veeder-Root Counter Driver (Port 05)
+
+```
+  Port 05 ──[R 1kΩ]──► B
+                  2N2222
+             C ──┬── COIL ──── +5V
+             E   │
+             │  [1N4007 flyback]
+            GND  │
+                 └──── +5V
+```
+
+The mechanical counter coil needs more current than a Z80 output pin can safely supply (~5mA max from Z80, coil needs 50–100mA). The 2N2222 acts as a switch:
+
+- **R 1kΩ** — limits base current to a safe level for the Z80 output pin
+- **2N2222 base (B)** — when Port 05 bit goes high the transistor saturates (switches on)
+- **Collector (C)** — connects to one end of the counter coil, other end to +5V
+- **Emitter (E)** — to GND
+- When transistor switches on, current flows +5V → COIL → C → E → GND, energising the coil and advancing the counter one digit
+
+**1N4007 flyback diode** — critical. When the transistor switches off, the collapsing magnetic field in the coil generates a large voltage spike (potentially hundreds of volts). The 1N4007 placed across the coil (cathode to +5V, anode to collector) clamps this spike and routes it safely back to +5V, protecting the transistor from destruction.
+
+To advance the counter: Z80 writes `1` to Port 05 bit → waits ~10ms → writes `0` → counter steps one digit.
+
+---
+
+### 7. Speaker (Port 02)
+
+```
+  Port 02 ──► piezo/spkr
+```
+
+The Z80 toggles a bit on Port 02 at a set frequency to produce a square wave tone:
+
+- Toggle every 1ms → 500 Hz tone
+- Toggle every 0.5ms → 1 kHz tone
+
+Used for **local feedback only** — key press beeps, error tones, status sounds. The actual DTMF dial tones go via the TP5089 → phone line path, not through this speaker. A piezo element is ideal — driven directly from the port pin with no amplifier needed.
+
+---
+
+### How the Three Work Together During a Call
+
+```
+  1. User presses key     → Port 00 read  → Port 02 beep confirmation
+  2. Digit sent to line   → Port 06 write → TP5089 → phone line
+  3. Counter advances     → Port 05 pulse → 2N2222 → Veeder-Root steps
+  4. Voice message plays  → Port 04 bits  → LX20LYA → speaker
+  5. Incoming DTMF heard  → /INT fires    → Port 03 read → action taken
+```
+
+---
+
 ## Hardware Issues — What Needs Fixing
 
 ### Must Fix
