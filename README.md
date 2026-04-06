@@ -246,6 +246,74 @@ The two optos keep the phone line and the digital circuit **completely electrica
 
 ---
 
+## DTMF Decode & Generate Explained
+
+### MT8870 — DTMF Decode (phone → TEC-1)
+
+The MT8870 listens to the phone audio and detects DTMF tones (the dual-frequency tones a keypad produces).
+
+```
+  AUDIO_RX ──► IN+
+  GND_ISO  ──► IN-
+```
+
+The isolated audio from 4N25 #1 feeds the MT8870's differential input. It internally filters and detects which two frequencies are present — each combination maps to a digit (0–9, *, #).
+
+```
+  Q1 ──┐
+  Q2 ──┼──► Port 03  (nibble)
+  Q3 ──┤
+  Q4 ──┘
+  STD ──────► Z80 /INT
+```
+
+- **Q1–Q4** are 4 output bits — a binary nibble representing the detected digit (e.g. `0101` = digit 5)
+- **STD (Steering Digit)** goes high when a valid tone pair has been detected and the nibble is stable — wired to the Z80's **/INT pin** so the CPU gets an interrupt the moment a digit arrives rather than polling constantly
+- The Z80 interrupt handler reads Port 03, grabs the 4-bit digit, and processes it
+
+**Decoupling cap:** The 100nF cap from +5V to GND sits right next to the MT8870 VDD pin — essential to suppress noise that would cause false detections.
+
+---
+
+### TP5089 — DTMF Generate (TEC-1 → phone)
+
+The TP5089 does the opposite — it synthesises DTMF tones to dial out.
+
+```
+  Port 06 ──► D0 ┐
+               D1 ┤ TP5089
+               D2 ┤
+               D3 ┘
+```
+
+The Z80 writes a 4-bit digit code to Port 06. The TP5089 reads D0–D3 and synthesises the correct pair of sine-wave frequencies for that digit. No software timing loops needed — the IC handles all tone generation in hardware.
+
+```
+  3.58MHz XTAL ─┬─ OSC1
+                └─ OSC2
+```
+
+The TP5089 needs a precise clock reference to generate accurate frequencies. **3.58 MHz** is the NTSC colour burst crystal — cheap, widely available, and exactly what the TP5089 datasheet specifies. Without it the tones would be off-frequency and the exchange would reject the call.
+
+```
+  TONE OUT ──► C2 ──► 4N25 #2
+```
+
+The generated tone is AC-coupled through C2 (blocks DC) and fed into 4N25 #2 which injects it onto the phone line.
+
+---
+
+### How They Work Together
+
+```
+  INBOUND:  phone line → 4N25 #1 → AUDIO_RX → MT8870 IN+ → Q1-Q4 → Port 03 → Z80
+  OUTBOUND: Z80 → Port 06 → TP5089 D0-D3 → TONE OUT → C2 → 4N25 #2 → phone line
+```
+
+They are independent paths — the MT8870 handles incoming digits (remote control via DTMF), the TP5089 handles outgoing dialling. Both share the same opto-isolation barrier to the phone line.
+
+---
+
 ## Hardware Issues — What Needs Fixing
 
 ### Must Fix
