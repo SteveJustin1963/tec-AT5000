@@ -567,6 +567,75 @@ Used for **local feedback only** — key press beeps, error tones, status sounds
 
 ---
 
+## Complete Code Plan — dial2.z80
+
+### Modules
+
+| # | Module | Purpose |
+|---|--------|---------|
+| 1 | Startup & Init | Clear RAM, safe port states, power LED on |
+| 2 | MT8870 Poll | Read incoming DTMF digit from port, store in DREG |
+| 3 | Keypad Scanner | Debounced change-detect scan, dispatch to handler |
+| 4 | Main Loop | Poll keypad, MT8870, auto-dial state machine |
+| 5 | Display Multiplexer | 6-digit LED mux, segment data to ports |
+| 6 | DTMF Dial | Off-hook, dial tone wait, TP5089 digit output, on-hook |
+| 7 | Veeder-Root Driver | 10ms pulse via 2N2222, flyback protection |
+| 8 | LX20LYA Voice | Record (hold key) and play (timed) routines |
+| 9 | LED Status | Shadow register updated on every state change |
+| 10 | Auto-Redial | Save last dialled to RBUF, redial on key B |
+| 11 | Segment Table | 7-seg codes for digits 0-9 at 0E00h |
+| 12 | Number Store | Save entry buffer as record in 16-entry NLIST |
+| 13 | Auto-Dial Sequencer | Cycle CIDX through NLIST, dial each number |
+| 14 | Answer Timeout | 5-second wait, assume answered, play message |
+| 15 | DTMF Command Interpreter | Remote control: 1=play, 2=rec, 3=auto, 0=reset |
+| 16 | Mode Toggle | Manual / Auto toggle, LED_AUT indicator |
+| 17 | Retro Rewind Effect | 20x rapid PLAY pulses after message, chirp sound |
+| 18 | Off-Hook / On-Hook | Relay control via Port 05h bit 1 |
+| 19 | Number Entry & Save | Digit keys fill EBUF, A=dial, auto-saves to NLIST |
+
+### Memory Map
+
+```
+  0800h–0BFFh   code
+  0C00h–0C05h   DBUF    display/segment buffer (6 bytes)
+  0C06h         DREG    incoming MT8870 digit (FFh=none)
+  0C07h         MREG    mode: 0=manual 1=auto
+  0C08h         DSTA    dial state: 0=idle 1=dialling 2=answered
+  0C09h         LEDS    LED shadow register
+  0C0Ah         NCNT    stored number count
+  0C0Bh         CIDX    auto-dial current index
+  0C0Ch         ELEN    entry buffer length
+  0C0Dh–0C13h   EBUF    raw digit entry buffer (7 bytes)
+  0C14h         PKEY    previous keypress (debounce)
+  0D00h–0D7Fh   NLIST   16 × 8-byte number records [0]=len [1-7]=digits
+  0D80h–0D87h   RBUF    redial buffer [0]=len [1-7]=digits
+  0E00h–0E09h   SEGTBL  7-segment lookup table
+  0FF0h         SP      stack base
+```
+
+### Keypad Map
+
+| Key | Code | Action |
+|-----|------|--------|
+| 0–9 | 00–09h | Enter digit into EBUF, advance Veeder-Root |
+| A | 0Ah | Dial number in EBUF, auto-save to NLIST |
+| B | 0Bh | Redial last number from RBUF |
+| C | 0Ch | Record voice message (hold to record) |
+| D | 0Dh | Play voice message |
+| E | 0Eh | Toggle Manual / Auto mode |
+| F | 0Fh | Reset — clear entry, on-hook, idle state |
+
+### Remote DTMF Commands (via MT8870)
+
+| Tone | Action |
+|------|--------|
+| 1 | Play message |
+| 2 | Record message |
+| 3 | Start auto-dial mode |
+| 0 | Stop / reset |
+
+---
+
 ## What the Code Does — Plain English
 
 The program is a **phone digit display driver**. It sits in a loop waiting for someone to give it a digit to display, then shows it on the TEC-1's LED display.

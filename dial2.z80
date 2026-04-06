@@ -1,0 +1,678 @@
+;================================================================
+; AT5000 AUTODIALER  —  dial2.z80
+; TEC-1 Z80 SBC  —  Complete Implementation
+;
+; Modules implemented:
+;   1  Startup & init            11  Segment table
+;   2  MT8870 DTMF poll          12  Number store/retrieve
+;   3  Keypad scanner            13  Auto-dial sequencer
+;   4  Main loop                 14  Answer timeout
+;   5  Display multiplexer       15  DTMF command interpreter
+;   6  DTMF dial (TP5089)        16  Manual/Auto mode toggle
+;   7  Veeder-Root driver        17  Retro rewind effect
+;   8  LX20LYA voice module      18  Off-hook/on-hook relay
+;   9  LED status shadow         19  Number entry & save
+;  10  Auto-redial
+;
+; Assemble:
+;   sdasz80 -l -o dial2.rel dial2.z80
+;   sdldz80 -n -i dial2.hex dial2.rel
+;
+; Memory map:
+;   0800h-0BFFh  code
+;   0C00h-0C14h  RAM variables
+;   0D00h-0D7Fh  phone number list  (16 x 8 bytes)
+;   0D80h-0D87h  redial buffer
+;   0E00h-0E09h  7-seg lookup table
+;   0FF0h        stack base (grows down)
+;
+; I/O ports:
+;   00h IN   keypad  (assumes direct key-code return 00h-0Fh, FFh=none)
+;   01h OUT  digit select
+;   02h OUT  segment data
+;   03h IN   MT8870 bits[3:0]=nibble bits[4]=STD
+;   04h OUT  LX20LYA: bit0=PLAY bit1=REC bit2=/CE(1=off)
+;   05h OUT  bit0=Veeder-Root pulse  bit1=relay(1=off-hook)
+;   06h OUT  TP5089 digit [3:0]
+;
+; Calibration notes:
+;   DEL1MS constant 0x99 assumes ~2MHz Z80 clock
+;   Adjust for actual clock speed (0x4C for 1MHz, 0x132 for 4MHz)
+;   Keypad port assumes decoded key value — see TEC-1 SCAN routine
+;================================================================
+
+; ---- I/O Ports -----------------------------------------------
+PORT_KEY  = 0x00
+PORT_SEL  = 0x01
+PORT_SEG  = 0x02
+PORT_MT   = 0x03
+PORT_VOI  = 0x04
+PORT_CTL  = 0x05
+PORT_DTM  = 0x06
+
+; ---- Port 04h (LX20LYA) output values -----------------------
+VOI_OFF   = 0x04        ; /CE high = module disabled
+VOI_PLY   = 0x01        ; /CE low, PLAY high
+VOI_REC   = 0x02        ; /CE low, REC high
+VOI_IDL   = 0x00        ; /CE low, idle (enabled but not playing)
+
+; ---- Port 05h bit masks ---------------------------------------
+CTL_VR    = 0x01        ; bit 0: Veeder-Root coil pulse
+CTL_RLY   = 0x02        ; bit 1: relay (1=off-hook)
+
+; ---- LED shadow register bits --------------------------------
+LED_PWR   = 0x01        ; power on
+LED_DIA   = 0x02        ; dialling
+LED_REC   = 0x04        ; recording
+LED_PLY   = 0x08        ; playing
+LED_RDL   = 0x10        ; redial available
+LED_AUT   = 0x20        ; auto mode active
+
+; ---- Dial state values ---------------------------------------
+ST_IDLE   = 0x00
+ST_DIAL   = 0x01
+ST_ANSW   = 0x02
+
+; ---- Keypad codes --------------------------------------------
+KEY_DIA   = 0x0A        ; A: dial number in entry buffer
+KEY_RDL   = 0x0B        ; B: redial last number
+KEY_REC   = 0x0C        ; C: record voice message
+KEY_PLY   = 0x0D        ; D: play voice message
+KEY_MOD   = 0x0E        ; E: toggle manual/auto mode
+KEY_RST   = 0x0F        ; F: reset / clear
+KEY_NON   = 0xFF        ; no key pressed
+
+; ---- Number storage constants --------------------------------
+MAX_NUM   = 0x10        ; 16 stored numbers maximum
+NUM_SZ    = 0x08        ; bytes per record: [0]=length [1-7]=digits
+MAX_DIG   = 0x06        ; max entry digits (= display positions)
+
+; ---- RAM variable addresses ----------------------------------
+DBUF      = 0x0C00      ; [6]  display segment buffer
+DREG      = 0x0C06      ; [1]  MT8870 digit register (FFh=none)
+MREG      = 0x0C07      ; [1]  mode: 0=manual 1=auto
+DSTA      = 0x0C08      ; [1]  dial state
+LEDS      = 0x0C09      ; [1]  LED shadow register
+NCNT      = 0x0C0A      ; [1]  stored number count
+CIDX      = 0x0C0B      ; [1]  auto-dial current index
+ELEN      = 0x0C0C      ; [1]  entry buffer digit count
+EBUF      = 0x0C0D      ; [7]  raw digit entry buffer (0-9)
+PKEY      = 0x0C14      ; [1]  previous keypress (debounce)
+
+NLIST     = 0x0D00      ; [128] number list: 16 x 8-byte records
+RBUF      = 0x0D80      ; [8]  redial buffer: [0]=len [1-7]=digits
+RBUF1     = 0x0D81      ; start of redial digit data
+SEGTBL    = 0x0E00      ; [10] 7-segment lookup table
+
+; ==============================================================
+.area _ABS_ (ABS)
+.org 0x0800
+
+; ==============================================================
+; M1 — STARTUP & INIT
+; ==============================================================
+START:
+    di
+    ld sp, #0x0FF0
+
+    ; Zero all RAM variables (DBUF through PKEY = 21 bytes)
+    ld hl, #DBUF
+    ld b, #0x15
+    xor a
+M1CLR:
+    ld (hl), a
+    inc hl
+    djnz M1CLR
+
+    ; Set sentinels
+    ld a, #0xFF
+    ld (DREG), a            ; no digit pending
+    ld a, #0xFF
+    ld (PKEY), a            ; no previous key
+    ld a, #LED_PWR
+    ld (LEDS), a            ; power LED on
+
+    ; Safe port states
+    xor a
+    out (PORT_SEL), a       ; display off
+    out (PORT_SEG), a
+    out (PORT_DTM), a       ; TP5089 idle
+    out (PORT_CTL), a       ; on-hook, VR off
+    ld a, #VOI_OFF
+    out (PORT_VOI), a       ; voice module disabled
+
+    jp MAIN
+
+; ==============================================================
+; M4 — MAIN LOOP
+; ==============================================================
+MAIN:
+    call DMUX               ; keep display alive
+    call KEYSCAN
+    cp #KEY_NON
+    call nz, KEYDISP        ; dispatch non-null key
+    call MTPOLL             ; check for incoming DTMF
+    ld a, (MREG)
+    or a
+    jr z, MAIN              ; manual mode — no auto-dial
+    ld a, (DSTA)
+    or a
+    jr nz, MAIN             ; busy — wait
+    call AUTODIAL           ; auto mode, idle — dial next
+    jp MAIN
+
+; ==============================================================
+; M3 — KEYPAD SCANNER  (change-detect debounce)
+; Returns key code in A, or KEY_NON if no new key
+; ==============================================================
+KEYSCAN:
+    in a, (PORT_KEY)
+    ld b, a
+    ld a, (PKEY)
+    cp b
+    ld a, b
+    ld (PKEY), a
+    jr z, KSC_NUL           ; same as before: no new event
+    ret                     ; new key (or release) — return it
+KSC_NUL:
+    ld a, #KEY_NON
+    ret
+
+; ==============================================================
+; M3 — KEY DISPATCHER
+; ==============================================================
+KEYDISP:
+    cp #KEY_DIA
+    jr z, KD_DIA
+    cp #KEY_RDL
+    jr z, KD_RDL
+    cp #KEY_REC
+    jr z, KD_REC
+    cp #KEY_PLY
+    jr z, KD_PLY
+    cp #KEY_MOD
+    jr z, KD_MOD
+    cp #KEY_RST
+    jr z, KD_RST
+    cp #0x0A
+    ret nc                  ; >= 0x0A and not a function key: ignore
+    ld c, a                 ; C = digit 0-9
+    jp DIGENT
+KD_DIA:
+    jp DIALDIAL
+KD_RDL:
+    jp REDIAL
+KD_REC:
+    jp DOREC
+KD_PLY:
+    jp DOPLAY
+KD_MOD:
+    jp DOMODE
+KD_RST:
+    jp DORESET
+
+; ==============================================================
+; M19 — DIGIT ENTRY
+; C = digit (0-9)
+; Writes segment code to DBUF and raw digit to EBUF
+; ==============================================================
+DIGENT:
+    ld a, (ELEN)
+    cp #MAX_DIG
+    ret nc                  ; buffer full, ignore
+    ; Segment lookup: SEGTBL[C]
+    ld hl, #SEGTBL
+    ld e, c
+    ld d, #0x00
+    add hl, de
+    ld a, (hl)
+    ld b, a                 ; B = segment code
+    ; Index = current ELEN
+    ld a, (ELEN)
+    ld e, a
+    ld d, #0x00
+    ; Write to display buffer
+    ld hl, #DBUF
+    add hl, de
+    ld (hl), b
+    ; Write raw digit to entry buffer
+    ld hl, #EBUF
+    add hl, de
+    ld (hl), c
+    ; Advance length
+    ld hl, #ELEN
+    inc (hl)
+    call VRPULSE            ; advance mechanical counter
+    ret
+
+; ==============================================================
+; M18 — OFF-HOOK / ON-HOOK
+; ==============================================================
+OFFHOOK:
+    in a, (PORT_CTL)
+    or #CTL_RLY
+    out (PORT_CTL), a
+    ret
+
+ONHOOK:
+    in a, (PORT_CTL)
+    and #0xFD               ; clear relay bit (CTL_RLY complement)
+    out (PORT_CTL), a
+    ret
+
+; ==============================================================
+; M6 — DIAL COMMAND
+; Saves to RBUF and NLIST, then dials from EBUF
+; ==============================================================
+DIALDIAL:
+    ld a, (ELEN)
+    or a
+    ret z                   ; nothing entered
+    call SAVRDL             ; save to redial buffer
+    ld a, (ELEN)
+    ld b, a                 ; B = digit count
+    ld hl, #EBUF            ; HL = digit array
+    push bc
+    push hl
+    call SAVENM             ; save to number list (uses ELEN/EBUF)
+    pop hl
+    pop bc
+    call DIALNM             ; dial: HL=digits, B=count
+    call ENTCLR             ; clear entry buffer and display
+    ret
+
+; DIALNM: dial a number
+; Entry: HL = pointer to raw digit array, B = digit count
+; ==============================================================
+DIALNM:
+    ld a, #ST_DIAL
+    ld (DSTA), a
+    ld a, (LEDS)
+    or #LED_DIA
+    ld (LEDS), a
+    call OFFHOOK
+    ld bc, #300
+    call DELMS              ; wait 300ms for dial tone
+DN_LOOP:
+    push bc
+    push hl
+    ld a, (hl)
+    and #0x0F               ; ensure lower nibble only
+    out (PORT_DTM), a       ; send digit to TP5089
+    ld bc, #100
+    call DELMS              ; 100ms tone on
+    xor a
+    out (PORT_DTM), a       ; silence
+    ld bc, #100
+    call DELMS              ; 100ms inter-digit gap
+    pop hl
+    pop bc
+    inc hl
+    djnz DN_LOOP
+    call WAITANSW           ; wait for answer
+    ret
+
+; ==============================================================
+; M14 — ANSWER TIMEOUT (5 seconds)
+; Simple approach: assume answered after timeout
+; ==============================================================
+WAITANSW:
+    ld bc, #5000            ; 5000ms = 5 seconds
+WA_LOOP:
+    push bc
+    call DMUX               ; keep display alive during wait
+    call DEL1MS
+    pop bc
+    dec bc
+    ld a, b
+    or c
+    jr nz, WA_LOOP
+    ; Timeout: treat as answered
+    ld a, #ST_ANSW
+    ld (DSTA), a
+    call DOPLAY             ; play pre-recorded message
+    call REWIND             ; retro rewind effect
+    call ONHOOK             ; hang up
+    ld a, #ST_IDLE
+    ld (DSTA), a
+    ld a, (LEDS)
+    and #0xFD               ; clear DIAL LED
+    or #LED_RDL             ; set REDIAL LED
+    ld (LEDS), a
+    ret
+
+; ==============================================================
+; M10 — REDIAL
+; ==============================================================
+REDIAL:
+    ld a, (RBUF)
+    or a
+    ret z                   ; no number stored
+    ld b, a                 ; B = digit count
+    ld hl, #RBUF1           ; HL = redial digits
+    call DIALNM
+    ret
+
+SAVRDL:
+    ; Copy EBUF → RBUF
+    ld a, (ELEN)
+    ld (RBUF), a
+    or a
+    ret z
+    ld hl, #EBUF
+    ld de, #RBUF1
+    ld b, a
+SRDL_LP:
+    ld a, (hl)
+    ld (de), a
+    inc hl
+    inc de
+    djnz SRDL_LP
+    ret
+
+; ==============================================================
+; M12 — SAVE NUMBER TO LIST
+; Saves current EBUF/ELEN as next record in NLIST
+; ==============================================================
+SAVENM:
+    ld a, (ELEN)
+    or a
+    ret z                   ; nothing to save
+    ld a, (NCNT)
+    cp #MAX_NUM
+    ret nc                  ; list full
+    ; Target address = NLIST + NCNT * NUM_SZ
+    ld hl, #NLIST
+    ld a, (NCNT)
+    ld b, a
+    or a
+    jr z, SV_ADDR
+SV_CALC:
+    ld de, #NUM_SZ
+    add hl, de
+    djnz SV_CALC
+SV_ADDR:
+    ; Write record: [0]=length, [1..]=digits
+    ld a, (ELEN)
+    ld (hl), a
+    inc hl
+    ld de, #EBUF
+    ld b, a
+SV_COPY:
+    ld a, (de)
+    ld (hl), a
+    inc hl
+    inc de
+    djnz SV_COPY
+    ld hl, #NCNT
+    inc (hl)
+    ret
+
+; ==============================================================
+; M13 — AUTO-DIAL SEQUENCER
+; Dials next number in NLIST, advances CIDX (wraps)
+; ==============================================================
+AUTODIAL:
+    ld a, (NCNT)
+    or a
+    ret z                   ; no numbers stored
+    ; Wrap CIDX if past end
+    ld a, (CIDX)
+    ld hl, #NCNT
+    cp (hl)
+    jr c, ADN_OK
+    xor a
+    ld (CIDX), a
+ADN_OK:
+    ld a, (CIDX)
+    ld b, a
+    ; Calculate record address: NLIST + CIDX * NUM_SZ
+    ld hl, #NLIST
+    or a
+    jr z, ADN_DIAL
+ADN_CALC:
+    ld de, #NUM_SZ
+    add hl, de
+    djnz ADN_CALC
+ADN_DIAL:
+    ld a, (hl)
+    or a
+    jr z, ADN_SKIP          ; empty record, skip
+    ld b, a
+    inc hl
+    call DIALNM             ; HL=digits, B=count
+ADN_SKIP:
+    ld hl, #CIDX
+    inc (hl)                ; advance to next number
+    ret
+
+; ==============================================================
+; M8 — RECORD  (hold C key to record, release to stop)
+; ==============================================================
+DOREC:
+    ld a, (LEDS)
+    or #LED_REC
+    ld (LEDS), a
+    ld a, #VOI_REC
+    out (PORT_VOI), a
+REC_HLD:
+    call DMUX
+    call KEYSCAN
+    cp #KEY_REC
+    jr z, REC_HLD           ; key still held: keep recording
+    ld a, #VOI_OFF
+    out (PORT_VOI), a
+    ld a, (LEDS)
+    and #0xFB               ; clear REC LED
+    ld (LEDS), a
+    ret
+
+; ==============================================================
+; M8 — PLAY  (plays for up to 20 seconds)
+; ==============================================================
+DOPLAY:
+    ld a, (LEDS)
+    or #LED_PLY
+    ld (LEDS), a
+    ld a, #VOI_PLY
+    out (PORT_VOI), a
+    ld bc, #20000           ; 20 second timeout
+PLY_LP:
+    push bc
+    call DMUX
+    call DEL1MS
+    pop bc
+    dec bc
+    ld a, b
+    or c
+    jr nz, PLY_LP
+    ld a, #VOI_OFF
+    out (PORT_VOI), a
+    ld a, (LEDS)
+    and #0xF7               ; clear PLAY LED
+    ld (LEDS), a
+    ret
+
+; ==============================================================
+; M17 — RETRO REWIND EFFECT
+; 20 rapid PLAY pulses simulating tape rewind chirp
+; ==============================================================
+REWIND:
+    ld b, #20
+RWD_LP:
+    push bc
+    ld a, #VOI_PLY
+    out (PORT_VOI), a
+    ld bc, #25
+    call DELMS              ; 25ms burst
+    ld a, #VOI_IDL
+    out (PORT_VOI), a
+    ld bc, #25
+    call DELMS              ; 25ms gap
+    pop bc
+    djnz RWD_LP
+    ld a, #VOI_OFF
+    out (PORT_VOI), a
+    ret
+
+; ==============================================================
+; M15 — MT8870 POLL & REMOTE DTMF COMMAND INTERPRETER
+; Polls STD bit (bit 4) of PORT_MT
+; Single-digit remote commands: 0=reset 1=play 2=rec 3=auto
+; ==============================================================
+MTPOLL:
+    in a, (PORT_MT)
+    ld b, a
+    and #0x10               ; test STD (steering digit valid)
+    ret z                   ; no new digit
+    ld a, b
+    and #0x0F               ; extract nibble
+    ld (DREG), a
+    cp #0x01
+    jr z, MTP_PLY
+    cp #0x02
+    jr z, MTP_REC
+    cp #0x03
+    jr z, MTP_AUT
+    cp #0x00
+    jr z, MTP_RST
+    ret
+MTP_PLY:
+    jp DOPLAY
+MTP_REC:
+    jp DOREC
+MTP_AUT:
+    ld a, #0x01
+    ld (MREG), a
+    ld a, (LEDS)
+    or #LED_AUT
+    ld (LEDS), a
+    ret
+MTP_RST:
+    jp DORESET
+
+; ==============================================================
+; M16 — MODE TOGGLE (manual / auto)
+; ==============================================================
+DOMODE:
+    ld a, (MREG)
+    xor #0x01               ; toggle bit 0
+    ld (MREG), a
+    or a
+    jr z, MOD_MAN
+    ld a, (LEDS)
+    or #LED_AUT
+    ld (LEDS), a
+    ret
+MOD_MAN:
+    ld a, (LEDS)
+    and #0xDF               ; clear AUTO LED
+    ld (LEDS), a
+    ret
+
+; ==============================================================
+; M16 — RESET / CLEAR
+; ==============================================================
+DORESET:
+    call ONHOOK
+    xor a
+    out (PORT_DTM), a
+    ld a, #VOI_OFF
+    out (PORT_VOI), a
+    xor a
+    ld (DSTA), a
+    ld (MREG), a
+    call ENTCLR
+    ld a, #LED_PWR
+    ld (LEDS), a
+    ret
+
+; Clear entry buffer, display buffer, reset ELEN
+ENTCLR:
+    xor a
+    ld (ELEN), a
+    ld hl, #DBUF
+    ld b, #MAX_DIG
+ECLR:
+    ld (hl), a
+    inc hl
+    djnz ECLR
+    ret
+
+; ==============================================================
+; M5 — DISPLAY MULTIPLEXER (6 digits)
+; ==============================================================
+DMUX:
+    ld c, #0x20             ; digit select: start bit 5
+    ld hl, #DBUF
+    ld d, #0x06
+DMX_LP:
+    ld a, (hl)
+    out (PORT_SEG), a       ; segment data
+    ld a, c
+    out (PORT_SEL), a       ; digit select on
+    ld b, #0x80             ; hold time (~128 cycles)
+DMX_DLY:
+    djnz DMX_DLY
+    xor a
+    out (PORT_SEL), a       ; digit select off
+    rrc c                   ; next digit position
+    inc hl
+    dec d
+    jr nz, DMX_LP
+    ret
+
+; ==============================================================
+; M7 — VEEDER-ROOT COUNTER PULSE
+; 10ms pulse via 2N2222 transistor driver
+; ==============================================================
+VRPULSE:
+    in a, (PORT_CTL)
+    or #CTL_VR
+    out (PORT_CTL), a       ; transistor on, coil energised
+    ld bc, #10
+    call DELMS              ; hold 10ms
+    in a, (PORT_CTL)
+    and #0xFE               ; clear VR bit (CTL_VR complement)
+    out (PORT_CTL), a       ; transistor off (1N4007 clamps spike)
+    ret
+
+; ==============================================================
+; DELAY ROUTINES
+; ==============================================================
+
+; DELMS: delay BC milliseconds (BC must be > 0)
+DELMS:
+    push bc
+    call DEL1MS
+    pop bc
+    dec bc
+    ld a, b
+    or c
+    jr nz, DELMS
+    ret
+
+; DEL1MS: delay approximately 1ms at 2MHz Z80
+; Adjust 0x99 constant for actual clock: 0x4C=1MHz 0x132=4MHz
+DEL1MS:
+    ld b, #0x99
+DEL1LP:
+    djnz DEL1LP
+    ret
+
+; ==============================================================
+; M11 — 7-SEGMENT LOOKUP TABLE
+; Standard common-cathode encoding
+; bit: 7=dp 6=g 5=f 4=e 3=d 2=c 1=b 0=a
+; ==============================================================
+.org SEGTBL
+    .db 0x3F        ; 0  abcdef
+    .db 0x06        ; 1  bc
+    .db 0x5B        ; 2  abdeg
+    .db 0x4F        ; 3  abcdg
+    .db 0x66        ; 4  bcfg
+    .db 0x6D        ; 5  acdfg
+    .db 0x7D        ; 6  acdefg
+    .db 0x07        ; 7  abc
+    .db 0x7F        ; 8  abcdefg
+    .db 0x6F        ; 9  abcdfg
