@@ -567,6 +567,114 @@ Used for **local feedback only** — key press beeps, error tones, status sounds
 
 ---
 
+## Corrected Code Flow (PHONE-DIALLER-Part 1.z80)
+
+```
+  PHONE-DIALLER-Part 1.z80 — Corrected Code Flow
+  ================================================
+
+  0800h  START
+    │
+    ├─ D = 08h
+    ├─ A = 0  (XOR A)
+    └─ HL = 0900h (BUF)
+         │
+         ▼
+  ┌──────────────────┐
+  │  (HL) = 00h      │  0806h  CLEAR
+  │  HL++            │  ← zero buffer 0900h–0907h
+  │  D--             │
+  └────────┬─────────┘
+           │ [JR NZ,CLEAR]
+           │ loop until D=0
+           │
+           ▼
+    DIGIT_REG = FFh    ← 090Fh, sentinel = no digit pending
+           │
+           ▼
+  ┌──────────────────┐
+  │  A = (DIGIT_REG) │  0810h  MAIN
+  │  A >= 0Ah ?      │  ← poll for valid digit
+  └────┬─────────────┘
+       │ YES (NC)           NO (digit 0–9)
+       │ [JR NC,MAIN]       │
+       └──────────┐         │
+                  ▼         ▼
+              (wait)   ┌──────────────────┐
+                       │  HL = 0880h      │  ← TONE_TBL base
+                       │  DE = 00:digit   │
+                       │  HL = HL + DE    │  ← 16-bit table lookup
+                       │  B = (HL)        │  ← save tone byte in B
+                       └────────┬─────────┘
+                                │
+                                ▼
+                       ┌──────────────────┐
+                       │  HL = 0900h      │  0823h  FIND_SLOT
+                       │  A = (HL)        │  ← scan buffer for empty slot
+                       │  A == 00h ?      │
+                       └────┬─────────────┘
+                            │ NO                  YES
+                            │ INC HL              │ [JR Z,STORE]
+                            │ [JR FIND_SLOT]      │
+                            └──────────┐          │
+                                       ▼          ▼
+                                   (scan)   ┌──────────────────┐
+                                            │  (HL) = B        │  082Bh  STORE
+                                            │  ← write tone    │
+                                            │  DIGIT_REG = FFh │  ← reset sentinel
+                                            └────────┬─────────┘
+                                                     │
+                                                     ▼
+                                            ┌──────────────────┐
+                                            │  C = 20h         │  0831h  DISPLAY
+                                            │  HL = 0900h      │
+                                            │  D = 06h         │  ← 6 digit positions
+                                            └────────┬─────────┘
+                                                     │
+                                                     ▼
+                                            ┌──────────────────────────────┐
+                                            │  A = (HL)                    │  0838h  DISP_OUTER
+                                            │  OUT (02h), A  ← seg data   │
+                                            │  A = C                       │
+                                            │  OUT (01h), A  ← digit on   │
+                                            │  B = 80h                     │
+                                            └────────┬─────────────────────┘
+                                                     │
+                                                     ▼
+                                            ┌──────────────────┐
+                                            │  DJNZ DISP_INNER │  0840h  DISP_INNER
+                                            │  ← 128 cycle     │
+                                            │     delay        │
+                                            └────────┬─────────┘
+                                                     │ B = 0
+                                                     ▼
+                                            ┌──────────────────┐
+                                            │  A = 0           │
+                                            │  OUT (01h), A    │  ← digit off (blank)
+                                            │  RRC C           │  ← next digit select
+                                            │  HL++            │
+                                            │  D--             │
+                                            └────────┬─────────┘
+                                                     │
+                                          [JR NZ, DISP_OUTER]
+                                          loop 6 times
+                                                     │ D = 0
+                                                     │
+                                          [JR MAIN] ─┘
+                                          ← back to poll for next digit
+
+
+  MEMORY MAP                    I/O PORTS
+  ──────────                    ─────────
+  0800h  code start             Port 01h  digit select (LED mux)
+  084Dh  code end  (77 bytes)   Port 02h  segment data
+  0880h  tone table (10 bytes)
+  0900h  display buffer (6 bytes)
+  090Fh  DIGIT_REG sentinel
+```
+
+---
+
 ## Current Code Flow (Faulty — PHONE-DIALLER-Part 1.z80)
 
 ```
